@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DealForge | Multi-Asset Deal Intelligence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        .heading { font-family: 'Space Grotesk', sans-serif; }
+        .hero-bg { background: linear-gradient(135deg, #0f172a 0%, #1e2937 100%); }
+        .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-hover:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100">
+    <!-- Navbar -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-zinc-950/80 backdrop-blur-lg border-b border-zinc-800">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-emerald-500 rounded-xl flex items-center justify-center text-xl font-bold">DF</div>
+                <span class="text-2xl font-semibold heading tracking-tight">DealForge</span>
+            </div>
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+                <a href="#features" class="hover:text-emerald-400 transition">Features</a>
+                <a href="#solutions" class="hover:text-emerald-400 transition">Solutions</a>
+                <a href="#pricing" class="hover:text-emerald-400 transition">Pricing</a>
+                <a href="#about" class="hover:text-emerald-400 transition">About</a>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="https://trydealforge.com" target="_blank" class="text-sm font-medium px-6 py-2.5 rounded-2xl border border-zinc-700 hover:border-zinc-400 transition">Sign In</a>
+                <a href="#beta" onclick="document.getElementById('beta-modal').classList.remove('hidden')" class="bg-emerald-500 hover:bg-emerald-600 text-black font-semibold px-6 py-2.5 rounded-2xl transition">Join Beta</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero-bg min-h-screen pt-24 flex items-center">
+        <div class="max-w-7xl mx-auto px-6 py-24 grid md:grid-cols-2 gap-12 items-center">
+            <div>
+                <div class="inline-flex items-center gap-2 bg-zinc-900 border border-zinc-700 rounded-3xl px-4 py-1.5 text-sm mb-6">
+                    <span class="text-emerald-400">●</span> Early Access for GCC Investment Offices
+                </div>
+                <h1 class="heading text-7xl leading-none font-semibold tracking-tighter mb-6">
+                    Your multi-asset<br>deal intelligence.
+                </h1>
+                <p class="text-2xl text-zinc-400 max-w-md">Stop tracking deals in spreadsheets. Built for the way GCC offices actually work.</p>
+                <div class="flex gap-4 mt-10">
+                    <a href="#beta" onclick="document.getElementById('beta-modal').classList.remove('hidden')" class="bg-white text-black px-8 py-4 rounded-2xl font-semibold text-lg flex items-center gap-3 hover:bg-zinc-100">
+                        Join the Beta <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="https://trydealforge.com/app" target="_blank" class="border border-zinc-400 px-8 py-4 rounded-2xl font-medium text-lg hover:bg-white/10">Watch Demo</a>
+                </div>
+                <div class="flex items-center gap-8 mt-12 text-sm">
+                    <div>32 modules</div>
+                    <div>6 tool suites</div>
+                    <div>5 asset classes</div>
+                </div>
+            </div>
+            <div class="relative">
+                <div class="bg-zinc-900/50 backdrop-blur-xl border border-zinc-700 rounded-3xl p-2 shadow-2xl">
+                    <img src="https://picsum.photos/id/1015/800/600" alt="DealForge Dashboard" class="rounded-2xl shadow-inner">
+                </div>
+                <div class="absolute -bottom-6 -right-6 bg-zinc-900 border border-emerald-500/30 rounded-2xl p-6 max-w-[220px]">
+                    <div class="text-emerald-400 text-sm font-medium mb-2">AI Deal Capture</div>
+                    <div class="text-4xl font-semibold heading">30+ fields</div>
+                    <div class="text-zinc-400 text-sm">auto-filled from pitch decks</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="py-24 bg-zinc-900">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="heading text-5xl font-semibold tracking-tight">One platform. Zero spreadsheets.</h2>
+                <p class="text-xl text-zinc-400 mt-4 max-w-2xl mx-auto">Most investment offices run on 6 disconnected tools. We replaced them all.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-8 card-hover">
+                    <div class="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-6">
+                        <i class="fas fa-robot text-3xl text-emerald-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-3">AI Deal Capture</h3>
+                    <p class="text-zinc-400">Upload a pitch deck. 30+ fields fill themselves instantly. No more data entry.</p>
+                    <ul class="mt-8 space-y-3 text-sm">
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-emerald-400"></i> Pitch deck parsing</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-emerald-400"></i> Term sheet extraction</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-emerald-400"></i> Auto-tagging</li>
+                    </ul>
+                </div>
+                <!-- Card 2 -->
+                <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-8 card-hover">
+                    <div class="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-6">
+                        <i class="fas fa-chart-line text-3xl text-emerald-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-3">Pipeline Intelligence</h3>
+                    <p class="text-zinc-400">Real-time deal flow visibility across equity, debt, real estate, and more.</p>
+                    <ul class="mt-8 space-y-3 text-sm">
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-emerald-400"></i> Multi-asset tracking</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-emerald-400"></i> Risk scoring</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-emerald-400"></i> Portfolio analytics</li>
+                    </ul>
+                </div>
+                <!-- Card 3 -->
+                <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-8 card-hover">
+                    <div class="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-6">
+                        <i class="fas fa-file-alt text-3xl text-emerald-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-3">Smart Reports</h3>
+                    <p class="text-zinc-400">Generate IC memos, LP reports, one-pagers with AI in seconds.</p>
+                    <ul class="mt-8 space-y-3 text-sm">
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-emerald-400"></i> Deal Assistant</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-emerald-400"></i> Weekly briefings</li>
+                        <li class="flex items-center gap-3"><i class="fas fa-check text-emerald-400"></i> MENA context</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Teaser -->
+    <section id="pricing" class="py-24">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <div class="max-w-md mx-auto">
+                <div class="text-emerald-400 text-sm font-medium mb-4">STARTER PLAN</div>
+                <div class="text-7xl font-semibold heading tracking-tighter mb-2">$499</div>
+                <div class="text-zinc-400">per office / month</div>
+                <a href="#beta" onclick="document.getElementById('beta-modal').classList.remove('hidden')" class="mt-8 inline-block bg-emerald-500 text-black px-10 py-4 rounded-3xl font-semibold text-lg">Start Free Trial</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Beta Modal -->
+    <div id="beta-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[100]">
+        <div class="bg-zinc-900 rounded-3xl p-10 max-w-md w-full mx-4">
+            <h3 class="text-3xl font-semibold mb-4">Join the Beta</h3>
+            <p class="text-zinc-400 mb-8">Get early access to DealForge for your GCC investment office.</p>
+            <form class="space-y-6" onsubmit="handleSubmit(event)">
+                <input type="text" placeholder="Your Name" class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-6 py-4 text-lg focus:outline-none focus:border-emerald-500">
+                <input type="email" placeholder="Work Email" class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-6 py-4 text-lg focus:outline-none focus:border-emerald-500">
+                <textarea placeholder="Tell us about your office" rows="3" class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl px-6 py-4 text-lg focus:outline-none focus:border-emerald-500"></textarea>
+                <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-black py-4 rounded-2xl font-semibold text-lg">Submit Application</button>
+            </form>
+            <button onclick="document.getElementById('beta-modal').classList.add('hidden')" class="mt-4 w-full text-zinc-400">Close</button>
+        </div>
+    </div>
+
+    <script>
+        function handleSubmit(e) {
+            e.preventDefault();
+            alert("Application received! We'll contact you soon.");
+            document.getElementById('beta-modal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
