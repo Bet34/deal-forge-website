@@ -7,9 +7,483 @@
   <meta name="description" content="Deal Forge is a free deal intelligence tool for flips, wholesale, pallets, and service jobs. Run the numbers, get a max offer, and track your pipeline.">
   <meta name="theme-color" content="#09090b">
   <link rel="canonical" href="https://bet34.github.io/deal-forge-website/">
+  <meta property="og:title" content="Deal Forge — Analyze any deal. Know the max offer.">
+  <meta property="og:description" content="Free deal analyzer and pipeline tracker. Flip, wholesale, pallet, or service job — get profit, ROI, and a go / no-go in seconds.">
+  <meta property="og:type" content="website">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            forge: { ember: "#f59e0b", steel: "#71717a", ink: "#09090b" }
+          },
+          fontFamily: {
+            display: ["Space Grotesk", "Inter", "system-ui", "sans-serif"],
+            sans: ["Inter", "system-ui", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    html { scroll-behavior: smooth; }
+    body { font-family: Inter, system-ui, sans-serif; }
+    .heading { font-family: "Space Grotesk", Inter, sans-serif; }
+    .ember-ring { box-shadow: 0 0 0 1px rgba(245,158,11,.25), 0 20px 50px -20px rgba(245,158,11,.25); }
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; }
+    .deal-card:focus-within { outline: 2px solid #f59e0b; outline-offset: 2px; }
+    @media print {
+      nav, footer, #beta-modal, .no-print { display: none !important; }
+      body { background: #fff; color: #111; }
+    }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Deal Forge",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "description": "Deal analyzer and pipeline tracker for flips, wholesale, inventory, and service jobs.",
+    "url": "https://bet34.github.io/deal-forge-website/"
+  }
+  </script>
 </head>
-<body class="bg-zinc-950 text-zinc-100">
-<p>placeholder</p>
+<body class="bg-zinc-950 text-zinc-100 antialiased">
+  <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 bg-amber-400 text-black px-3 py-2 rounded-lg z-[60]">Skip to content</a>
+  <nav class="fixed top-0 inset-x-0 z-50 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-lg" aria-label="Primary">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <a href="#top" class="flex items-center gap-2.5">
+        <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-600 grid place-items-center heading font-bold text-black text-sm" aria-hidden="true">DF</span>
+        <span class="heading text-lg font-semibold tracking-tight">Deal Forge</span>
+      </a>
+      <div class="hidden md:flex items-center gap-7 text-sm text-zinc-300">
+        <a href="#forge" class="hover:text-amber-400">Analyzer</a>
+        <a href="#pipeline" class="hover:text-amber-400">Pipeline</a>
+        <a href="#pricing" class="hover:text-amber-400">Pricing</a>
+        <a href="#faq" class="hover:text-amber-400">FAQ</a>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="#forge" class="hidden sm:inline-flex bg-amber-400 hover:bg-amber-300 text-black font-semibold text-sm px-4 py-2 rounded-xl">Forge a deal</a>
+        <button type="button" id="menu-btn" class="md:hidden w-10 h-10 grid place-items-center rounded-xl border border-zinc-700" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
+          <span class="heading text-lg">☰</span>
+        </button>
+      </div>
+    </div>
+    <div id="mobile-menu" class="hidden md:hidden border-t border-zinc-800 bg-zinc-950 px-4 py-3 space-y-2 text-sm">
+      <a href="#forge" class="block py-2">Analyzer</a>
+      <a href="#pipeline" class="block py-2">Pipeline</a>
+      <a href="#pricing" class="block py-2">Pricing</a>
+      <a href="#faq" class="block py-2">FAQ</a>
+    </div>
+  </nav>
+  <main id="main">
+    <section id="top" class="pt-28 pb-16 sm:pt-32 sm:pb-24">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-12 items-center">
+        <div>
+          <p class="inline-flex items-center gap-2 text-xs font-medium tracking-wide uppercase text-amber-400 bg-amber-400/10 border border-amber-400/20 rounded-full px-3 py-1 mb-5">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-400" aria-hidden="true"></span>
+            Live in the browser. No signup.
+          </p>
+          <h1 class="heading text-4xl sm:text-6xl font-bold tracking-tight leading-[1.05] mb-5">
+            Run the numbers.<br>
+            <span class="text-amber-400">Know the max offer.</span>
+          </h1>
+          <p class="text-lg text-zinc-400 max-w-xl mb-8">
+            Deal Forge turns a flip, wholesale contract, pallet lot, or service job into profit, ROI, and a go / no-go. Built for operators who still live in spreadsheets.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <a href="#forge" class="inline-flex justify-center items-center gap-2 bg-amber-400 hover:bg-amber-300 text-black font-semibold px-6 py-3.5 rounded-2xl">Open the analyzer</a>
+            <a href="#pipeline" class="inline-flex justify-center items-center gap-2 border border-zinc-700 hover:border-zinc-400 px-6 py-3.5 rounded-2xl">See the pipeline</a>
+          </div>
+          <dl class="mt-10 grid grid-cols-3 gap-4 max-w-md text-sm">
+            <div><dt class="text-zinc-500">Deal types</dt><dd class="heading text-2xl font-semibold">4</dd></div>
+            <div><dt class="text-zinc-500">Saves on device</dt><dd class="heading text-2xl font-semibold">Yes</dd></div>
+            <div><dt class="text-zinc-500">Price to start</dt><dd class="heading text-2xl font-semibold">$0</dd></div>
+          </dl>
+        </div>
+        <aside class="bg-zinc-900 border border-zinc-800 rounded-3xl p-5 ember-ring" aria-label="Sample deal result">
+          <p class="text-xs uppercase tracking-wider text-zinc-500 mb-3">Sample — Taylor, MI flip</p>
+          <div class="flex items-end justify-between mb-4">
+            <div>
+              <p class="text-zinc-400 text-sm">Max offer</p>
+              <p class="heading text-4xl font-bold text-amber-400">$142,400</p>
+            </div>
+            <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-400">GO</span>
+          </div>
+          <ul class="grid grid-cols-2 gap-3 text-sm">
+            <li class="bg-zinc-950 rounded-xl p-3"><span class="block text-zinc-500">ARV</span>$220,000</li>
+            <li class="bg-zinc-950 rounded-xl p-3"><span class="block text-zinc-500">Repairs</span>$28,000</li>
+            <li class="bg-zinc-950 rounded-xl p-3"><span class="block text-zinc-500">Target profit</span>$30,000</li>
+            <li class="bg-zinc-950 rounded-xl p-3"><span class="block text-zinc-500">ROI</span>21.1%</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+    <section class="border-y border-zinc-800 bg-zinc-900/40 py-10">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 grid sm:grid-cols-3 gap-8 text-center">
+        <div>
+          <h2 class="heading text-lg font-semibold mb-1">Stop guessing the offer</h2>
+          <p class="text-sm text-zinc-400">Max bid is the leftover after repairs, hold, close, and the profit you actually need.</p>
+        </div>
+        <div>
+          <h2 class="heading text-lg font-semibold mb-1">One board for every deal</h2>
+          <p class="text-sm text-zinc-400">Save analyzed deals to a local pipeline. Watch, offer, under contract, closed.</p>
+        </div>
+        <div>
+          <h2 class="heading text-lg font-semibold mb-1">Works offline after load</h2>
+          <p class="text-sm text-zinc-400">Numbers live in your browser. Nothing is sent to a server.</p>
+        </div>
+      </div>
+    </section>
+    <section id="forge" class="py-20">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+          <div>
+            <p class="text-amber-400 text-sm font-medium mb-1">Analyzer</p>
+            <h2 class="heading text-3xl sm:text-4xl font-bold tracking-tight">Forge the deal</h2>
+          </div>
+          <p class="text-sm text-zinc-500 max-w-sm">Pick a type. Enter the real numbers. Get a verdict you can save to the pipeline.</p>
+        </div>
+        <div class="flex flex-wrap gap-2 mb-6" role="tablist" aria-label="Deal type">
+          <button type="button" class="type-btn px-4 py-2 rounded-xl text-sm font-medium bg-amber-400 text-black" data-type="flip">House flip</button>
+          <button type="button" class="type-btn px-4 py-2 rounded-xl text-sm font-medium bg-zinc-900 border border-zinc-800" data-type="wholesale">Wholesale</button>
+          <button type="button" class="type-btn px-4 py-2 rounded-xl text-sm font-medium bg-zinc-900 border border-zinc-800" data-type="pallet">Pallet / lot</button>
+          <button type="button" class="type-btn px-4 py-2 rounded-xl text-sm font-medium bg-zinc-900 border border-zinc-800" data-type="service">Service job</button>
+        </div>
+        <div class="grid lg:grid-cols-5 gap-6">
+          <form id="deal-form" class="lg:col-span-3 bg-zinc-900 border border-zinc-800 rounded-3xl p-5 sm:p-7 space-y-4" novalidate>
+            <div>
+              <label for="deal-name" class="block text-sm text-zinc-400 mb-1">Deal name</label>
+              <input id="deal-name" name="name" type="text" maxlength="80" placeholder="124 Oak St, Taylor" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-400" autocomplete="off">
+            </div>
+            <div id="fields" class="grid sm:grid-cols-2 gap-4"></div>
+            <div class="flex flex-col sm:flex-row gap-3 pt-2 no-print">
+              <button type="submit" class="flex-1 bg-amber-400 hover:bg-amber-300 text-black font-semibold py-3 rounded-xl">Calculate</button>
+              <button type="button" id="save-deal" class="flex-1 border border-zinc-700 hover:border-amber-400 py-3 rounded-xl">Save to pipeline</button>
+              <button type="button" id="reset-deal" class="sm:w-auto px-5 border border-zinc-800 text-zinc-400 py-3 rounded-xl">Reset</button>
+            </div>
+          </form>
+          <div class="lg:col-span-2 bg-zinc-900 border border-zinc-800 rounded-3xl p-5 sm:p-7" aria-live="polite">
+            <p class="text-xs uppercase tracking-wider text-zinc-500 mb-4">Verdict</p>
+            <div id="verdict" class="space-y-4">
+              <p class="text-zinc-500">Enter numbers and hit Calculate.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="pipeline" class="py-20 border-t border-zinc-800 bg-zinc-900/30">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+          <div>
+            <p class="text-amber-400 text-sm font-medium mb-1">Pipeline</p>
+            <h2 class="heading text-3xl sm:text-4xl font-bold tracking-tight">Deals on the board</h2>
+          </div>
+          <div class="flex gap-2 no-print">
+            <button type="button" id="seed-demo" class="text-sm border border-zinc-700 px-3 py-2 rounded-xl">Load sample deals</button>
+            <button type="button" id="clear-board" class="text-sm border border-zinc-800 text-zinc-400 px-3 py-2 rounded-xl">Clear board</button>
+          </div>
+        </div>
+        <div id="board" class="grid md:grid-cols-4 gap-4"></div>
+        <p id="board-empty" class="text-zinc-500 text-sm mt-4 hidden">No deals yet. Analyze one and save it, or load samples.</p>
+      </div>
+    </section>
+    <section id="pricing" class="py-20">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <h2 class="heading text-3xl sm:text-4xl font-bold tracking-tight text-center mb-3">Simple pricing</h2>
+        <p class="text-center text-zinc-400 mb-10">The core tools stay free. Pro is for operators who want saved cloud sync later.</p>
+        <div class="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+          <article class="border border-zinc-800 rounded-3xl p-8 bg-zinc-900">
+            <h3 class="heading text-2xl font-semibold">Forge</h3>
+            <p class="heading text-5xl font-bold my-4">$0</p>
+            <ul class="space-y-2 text-sm text-zinc-300 mb-8">
+              <li>4 deal analyzers</li>
+              <li>Local pipeline board</li>
+              <li>Go / no-go + max offer</li>
+              <li>Runs in any browser</li>
+            </ul>
+            <a href="#forge" class="block text-center bg-zinc-800 hover:bg-zinc-700 rounded-xl py-3 font-medium">Use it now</a>
+          </article>
+          <article class="border border-amber-400/40 rounded-3xl p-8 bg-zinc-900 ember-ring">
+            <h3 class="heading text-2xl font-semibold">Forge Pro <span class="text-xs text-amber-400 font-medium align-middle">waitlist</span></h3>
+            <p class="heading text-5xl font-bold my-4">$19<span class="text-lg text-zinc-400 font-medium">/mo</span></p>
+            <ul class="space-y-2 text-sm text-zinc-300 mb-8">
+              <li>Everything in Forge</li>
+              <li>Cloud sync across devices</li>
+              <li>PDF deal sheets</li>
+              <li>Team board (coming)</li>
+            </ul>
+            <button type="button" id="open-beta" class="w-full bg-amber-400 hover:bg-amber-300 text-black font-semibold rounded-xl py-3">Join the waitlist</button>
+          </article>
+        </div>
+      </div>
+    </section>
+    <section id="faq" class="py-20 border-t border-zinc-800">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6">
+        <h2 class="heading text-3xl font-bold tracking-tight mb-8">FAQ</h2>
+        <dl class="space-y-6 text-sm">
+          <div>
+            <dt class="heading text-lg font-semibold">Where is my data stored?</dt>
+            <dd class="text-zinc-400 mt-1">On this device, in localStorage. Clearing site data wipes the board. Export is on the roadmap.</dd>
+          </div>
+          <div>
+            <dt class="heading text-lg font-semibold">How is max offer calculated on a flip?</dt>
+            <dd class="text-zinc-400 mt-1">ARV minus repairs, holding, buy close, sell close, and your target profit. That leftover is the most you should pay.</dd>
+          </div>
+          <div>
+            <dt class="heading text-lg font-semibold">Is this financial advice?</dt>
+            <dd class="text-zinc-400 mt-1">No. It is a calculator. You still verify comps, repairs, and title.</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+  </main>
+  <footer class="border-t border-zinc-800 py-12 text-sm text-zinc-500">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row justify-between gap-6">
+      <div>
+        <p class="heading text-zinc-200 text-lg mb-1">Deal Forge</p>
+        <p>Downriver / Detroit Metro · Built by Bet34</p>
+        <p class="mt-2"><a class="hover:text-amber-400" href="https://github.com/Bet34/deal-forge-website">GitHub repo</a></p>
+      </div>
+      <p>© 2026 Deal Forge. Tools only. You own the risk.</p>
+    </div>
+  </footer>
+  <div id="beta-modal" class="hidden fixed inset-0 z-[70] bg-black/75 items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="beta-title">
+    <div class="bg-zinc-900 border border-zinc-700 rounded-3xl p-8 max-w-md w-full">
+      <h3 id="beta-title" class="heading text-2xl font-semibold mb-2">Pro waitlist</h3>
+      <p class="text-zinc-400 text-sm mb-6">Leave a name and email. Stored on this device for now. Wire a form endpoint when you are ready.</p>
+      <form id="beta-form" class="space-y-4">
+        <div>
+          <label for="beta-name" class="block text-sm mb-1">Name</label>
+          <input id="beta-name" required name="name" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-400">
+        </div>
+        <div>
+          <label for="beta-email" class="block text-sm mb-1">Email</label>
+          <input id="beta-email" required type="email" name="email" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-400">
+        </div>
+        <p id="beta-msg" class="text-sm text-emerald-400 hidden" role="status"></p>
+        <button type="submit" class="w-full bg-amber-400 text-black font-semibold py-3 rounded-xl">Join waitlist</button>
+        <button type="button" id="close-beta" class="w-full text-zinc-400 py-2">Close</button>
+      </form>
+    </div>
+  </div>
+  <script>
+    const SCHEMAS = {
+      flip: [["arv","After repair value (ARV)",220000],["repairs","Repairs",28000],["holding","Holding costs",4500],["buyClose","Buy closing costs",3200],["sellClose","Sell closing costs",11900],["profit","Target profit",30000]],
+      wholesale: [["arv","ARV",220000],["repairs","Buyer repair budget",28000],["buyerProfit","Buyer target profit",25000],["assignFee","Your assignment fee",8000],["closePct","Buyer close + hold estimate",15000]],
+      pallet: [["buy","Lot buy price",420],["units","Sellable units",48],["sellEach","Sell price each",18],["fees","Fees + shipping",85],["deadPct","Dead stock %",12]],
+      service: [["hours","Labor hours",6],["rate","Hourly rate you want",95],["materials","Materials",140],["markup","Material markup %",25],["overhead","Trip / overhead",45]]
+    };
+    const LABELS = { flip: "House flip", wholesale: "Wholesale", pallet: "Pallet / lot", service: "Service job" };
+    const STATUSES = ["watch", "offer", "contract", "closed"];
+    const STATUS_LABEL = { watch: "Watch", offer: "Offer", contract: "Under contract", closed: "Closed" };
+    let currentType = "flip";
+    let lastResult = null;
+    const KEY = "dealforge.v2.pipeline";
+    const WAIT_KEY = "dealforge.v2.waitlist";
+    const $ = (id) => document.getElementById(id);
+    const money = (n) => (n < 0 ? "-" : "") + "$" + Math.abs(Math.round(n)).toLocaleString();
+    const pct = (n) => (isFinite(n) ? (n * 100).toFixed(1) + "%" : "—");
+    function renderFields() {
+      const wrap = $("fields");
+      wrap.innerHTML = SCHEMAS[currentType].map(([key, label, def]) => `
+        <div>
+          <label for="f-${key}" class="block text-sm text-zinc-400 mb-1">${label}</label>
+          <input id="f-${key}" name="${key}" type="number" inputmode="decimal" step="any" min="0" value="${def}"
+            class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-400">
+        </div>`).join("");
+    }
+    function readInputs() {
+      const data = {};
+      SCHEMAS[currentType].forEach(([key]) => {
+        const raw = document.getElementById("f-" + key).value;
+        const n = parseFloat(raw);
+        data[key] = Number.isFinite(n) ? n : 0;
+      });
+      data.name = $("deal-name").value.trim() || (LABELS[currentType] + " deal");
+      data.type = currentType;
+      return data;
+    }
+    function analyze(d) {
+      let maxOffer = 0, profit = 0, invested = 0, roi = 0, notes = [];
+      if (d.type === "flip") {
+        maxOffer = d.arv - d.repairs - d.holding - d.buyClose - d.sellClose - d.profit;
+        invested = maxOffer + d.repairs + d.holding + d.buyClose;
+        profit = d.profit;
+        roi = invested > 0 ? profit / invested : 0;
+        notes = [["ARV", money(d.arv)], ["All-in if you pay max", money(invested + d.sellClose)], ["70% rule check", money(d.arv * 0.7 - d.repairs)]];
+      } else if (d.type === "wholesale") {
+        const buyerMax = d.arv - d.repairs - d.buyerProfit - d.closePct;
+        maxOffer = buyerMax - d.assignFee;
+        profit = d.assignFee;
+        invested = 0;
+        roi = Infinity;
+        notes = [["Buyer max purchase", money(buyerMax)], ["Your contract price", money(maxOffer)], ["Assignment fee", money(d.assignFee)]];
+      } else if (d.type === "pallet") {
+        const live = d.units * (1 - d.deadPct / 100);
+        const revenue = live * d.sellEach;
+        invested = d.buy + d.fees;
+        profit = revenue - invested;
+        maxOffer = Math.max(0, revenue - d.fees - invested * 0.35);
+        roi = invested > 0 ? profit / invested : 0;
+        notes = [["Expected revenue", money(revenue)], ["Live units", Math.round(live).toString()], ["Break-even sell-each", money(live ? invested / live : 0)]];
+      } else {
+        const mat = d.materials * (1 + d.markup / 100);
+        const quote = d.hours * d.rate + mat + d.overhead;
+        invested = d.hours * (d.rate * 0.35) + d.materials + d.overhead;
+        profit = quote - (d.materials + d.overhead);
+        maxOffer = quote;
+        roi = invested > 0 ? profit / invested : 0;
+        notes = [["Customer quote", money(quote)], ["Labor line", money(d.hours * d.rate)], ["Materials after markup", money(mat)]];
+      }
+      const go = profit > 0 && (d.type === "wholesale" || d.type === "service" || roi >= 0.15) && maxOffer >= 0;
+      return { ...d, maxOffer, profit, invested, roi, notes, go, id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6) };
+    }
+    function renderVerdict(r) {
+      lastResult = r;
+      $("verdict").innerHTML = `
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p class="text-zinc-400 text-sm">${r.type === "service" ? "Quote price" : "Max you should pay"}</p>
+            <p class="heading text-4xl font-bold ${r.maxOffer >= 0 ? "text-amber-400" : "text-red-400"}">${money(r.maxOffer)}</p>
+          </div>
+          <span class="text-xs font-semibold px-2.5 py-1 rounded-full ${r.go ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"}">${r.go ? "GO" : "NO-GO"}</span>
+        </div>
+        <ul class="grid grid-cols-2 gap-2 text-sm">
+          <li class="bg-zinc-950 rounded-xl p-3"><span class="block text-zinc-500">Profit</span>${money(r.profit)}</li>
+          <li class="bg-zinc-950 rounded-xl p-3"><span class="block text-zinc-500">ROI</span>${r.roi === Infinity ? "Fee deal" : pct(r.roi)}</li>
+        </ul>
+        <ul class="text-sm space-y-1 text-zinc-300">
+          ${r.notes.map(([k, v]) => `<li class="flex justify-between gap-3"><span class="text-zinc-500">${k}</span><span>${v}</span></li>`).join("")}
+        </ul>
+        <p class="text-xs text-zinc-500">${r.name} · ${LABELS[r.type]}</p>`;
+    }
+    function loadBoard() { try { return JSON.parse(localStorage.getItem(KEY) || "[]"); } catch { return []; } }
+    function saveBoard(rows) { localStorage.setItem(KEY, JSON.stringify(rows)); }
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&", "<": "<", ">": ">", '"': """, "'": "&#39;" }[c]));
+    }
+    function renderBoard() {
+      const rows = loadBoard();
+      const board = $("board");
+      $("board-empty").classList.toggle("hidden", rows.length > 0);
+      board.innerHTML = STATUSES.map((st) => {
+        const col = rows.filter((d) => d.status === st);
+        return `
+          <section class="bg-zinc-950 border border-zinc-800 rounded-2xl p-3 min-h-[180px]">
+            <h3 class="text-xs uppercase tracking-wider text-zinc-500 mb-3">${STATUS_LABEL[st]} · ${col.length}</h3>
+            <div class="space-y-2">
+              ${col.map((d) => `
+                <article class="deal-card bg-zinc-900 border border-zinc-800 rounded-xl p-3">
+                  <p class="font-medium text-sm truncate">${escapeHtml(d.name)}</p>
+                  <p class="text-amber-400 text-sm">${money(d.maxOffer)}</p>
+                  <p class="text-xs text-zinc-500">${LABELS[d.type] || d.type} · ${d.go ? "GO" : "NO-GO"}</p>
+                  <label class="sr-only" for="st-${d.id}">Move ${escapeHtml(d.name)}</label>
+                  <select id="st-${d.id}" data-id="${d.id}" class="status-sel mt-2 w-full bg-zinc-950 border border-zinc-800 rounded-lg text-xs px-2 py-1">
+                    ${STATUSES.map((s) => `<option value="${s}" ${s === d.status ? "selected" : ""}>${STATUS_LABEL[s]}</option>`).join("")}
+                  </select>
+                  <button type="button" data-del="${d.id}" class="del-btn mt-2 text-xs text-zinc-500 hover:text-red-400">Remove</button>
+                </article>`).join("")}
+            </div>
+          </section>`;
+      }).join("");
+    }
+    document.querySelectorAll(".type-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        currentType = btn.dataset.type;
+        document.querySelectorAll(".type-btn").forEach((b) => {
+          const on = b === btn;
+          b.classList.toggle("bg-amber-400", on);
+          b.classList.toggle("text-black", on);
+          b.classList.toggle("bg-zinc-900", !on);
+          b.classList.toggle("border", !on);
+          b.classList.toggle("border-zinc-800", !on);
+        });
+        renderFields();
+        lastResult = null;
+        $("verdict").innerHTML = '<p class="text-zinc-500">Enter numbers and hit Calculate.</p>';
+      });
+    });
+    $("deal-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      renderVerdict(analyze(readInputs()));
+    });
+    $("save-deal").addEventListener("click", () => {
+      if (!lastResult) renderVerdict(analyze(readInputs()));
+      const rows = loadBoard();
+      rows.unshift({ ...lastResult, status: lastResult.go ? "offer" : "watch" });
+      saveBoard(rows);
+      renderBoard();
+      document.getElementById("pipeline").scrollIntoView({ behavior: "smooth" });
+    });
+    $("reset-deal").addEventListener("click", () => {
+      $("deal-name").value = "";
+      renderFields();
+      lastResult = null;
+      $("verdict").innerHTML = '<p class="text-zinc-500">Enter numbers and hit Calculate.</p>';
+    });
+    $("board").addEventListener("change", (e) => {
+      if (!e.target.classList.contains("status-sel")) return;
+      const rows = loadBoard().map((d) => d.id === e.target.dataset.id ? { ...d, status: e.target.value } : d);
+      saveBoard(rows);
+      renderBoard();
+    });
+    $("board").addEventListener("click", (e) => {
+      const id = e.target.dataset.del;
+      if (!id) return;
+      saveBoard(loadBoard().filter((d) => d.id !== id));
+      renderBoard();
+    });
+    $("seed-demo").addEventListener("click", () => {
+      const samples = [
+        analyze({ type: "flip", name: "124 Oak St, Taylor", arv: 220000, repairs: 28000, holding: 4500, buyClose: 3200, sellClose: 11900, profit: 30000 }),
+        analyze({ type: "pallet", name: "Amazon returns pallet", buy: 420, units: 48, sellEach: 18, fees: 85, deadPct: 12 }),
+        analyze({ type: "wholesale", name: "Lincoln Park assign", arv: 175000, repairs: 22000, buyerProfit: 20000, assignFee: 7000, closePct: 12000 }),
+        analyze({ type: "service", name: "Water heater swap", hours: 4, rate: 110, materials: 980, markup: 20, overhead: 65 })
+      ].map((d, i) => ({ ...d, status: STATUSES[i] }));
+      saveBoard(samples);
+      renderBoard();
+    });
+    $("clear-board").addEventListener("click", () => {
+      if (confirm("Clear every deal on this device?")) { saveBoard([]); renderBoard(); }
+    });
+    const menuBtn = $("menu-btn");
+    const mobile = $("mobile-menu");
+    menuBtn.addEventListener("click", () => {
+      const open = mobile.classList.toggle("hidden") === false;
+      menuBtn.setAttribute("aria-expanded", String(open));
+    });
+    mobile.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => {
+      mobile.classList.add("hidden");
+      menuBtn.setAttribute("aria-expanded", "false");
+    }));
+    const modal = $("beta-modal");
+    function openModal() { modal.classList.remove("hidden"); modal.classList.add("flex"); $("beta-name").focus(); }
+    function closeModal() { modal.classList.add("hidden"); modal.classList.remove("flex"); }
+    $("open-beta").addEventListener("click", openModal);
+    $("close-beta").addEventListener("click", closeModal);
+    modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+    $("beta-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const entry = { name: $("beta-name").value.trim(), email: $("beta-email").value.trim(), at: new Date().toISOString() };
+      const list = JSON.parse(localStorage.getItem(WAIT_KEY) || "[]");
+      list.push(entry);
+      localStorage.setItem(WAIT_KEY, JSON.stringify(list));
+      $("beta-msg").textContent = "Saved on this device. " + entry.email;
+      $("beta-msg").classList.remove("hidden");
+      $("beta-form").reset();
+    });
+    renderFields();
+    renderBoard();
+  </script>
 </body>
 </html>
