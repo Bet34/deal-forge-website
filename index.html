@@ -10,6 +10,7 @@
   <meta property="og:title" content="Deal Forge — Analyze any deal. Know the max offer.">
   <meta property="og:description" content="Free deal analyzer and pipeline tracker. Flip, wholesale, pallet, or service job — get profit, ROI, and a go / no-go in seconds.">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://bet34.github.io/deal-forge-website/">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -38,9 +39,13 @@
     input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     input[type=number] { -moz-appearance: textfield; }
     .deal-card:focus-within { outline: 2px solid #f59e0b; outline-offset: 2px; }
+    .deal-card { transition: border-color .15s ease, transform .15s ease; }
+    .deal-card:hover { border-color: #52525b; }
+    button, a, select, input { transition: all .15s ease; }
     @media print {
       nav, footer, #beta-modal, .no-print { display: none !important; }
       body { background: #fff; color: #111; }
+      #verdict { border: 1px solid #ccc; padding: 1rem; }
     }
   </style>
   <script type="application/ld+json">
@@ -58,6 +63,7 @@
 </head>
 <body class="bg-zinc-950 text-zinc-100 antialiased">
   <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 bg-amber-400 text-black px-3 py-2 rounded-lg z-[60]">Skip to content</a>
+
   <nav class="fixed top-0 inset-x-0 z-50 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-lg" aria-label="Primary">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
       <a href="#top" class="flex items-center gap-2.5">
@@ -73,7 +79,7 @@
       <div class="flex items-center gap-2">
         <a href="#forge" class="hidden sm:inline-flex bg-amber-400 hover:bg-amber-300 text-black font-semibold text-sm px-4 py-2 rounded-xl">Forge a deal</a>
         <button type="button" id="menu-btn" class="md:hidden w-10 h-10 grid place-items-center rounded-xl border border-zinc-700" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
-          <span class="heading text-lg">☰</span>
+          <span class="heading text-lg" aria-hidden="true">☰</span>
         </button>
       </div>
     </div>
@@ -84,7 +90,9 @@
       <a href="#faq" class="block py-2">FAQ</a>
     </div>
   </nav>
+
   <main id="main">
+    <!-- Hero -->
     <section id="top" class="pt-28 pb-16 sm:pt-32 sm:pb-24">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-12 items-center">
         <div>
@@ -97,7 +105,7 @@
             <span class="text-amber-400">Know the max offer.</span>
           </h1>
           <p class="text-lg text-zinc-400 max-w-xl mb-8">
-            Deal Forge turns a flip, wholesale contract, pallet lot, or service job into profit, ROI, and a go / no-go. Built for operators who still live in spreadsheets.
+            Deal Forge turns a flip, wholesale contract, pallet lot, or service job into profit, ROI, and a clear go / no-go. Built for operators who still live in spreadsheets.
           </p>
           <div class="flex flex-col sm:flex-row gap-3">
             <a href="#forge" class="inline-flex justify-center items-center gap-2 bg-amber-400 hover:bg-amber-300 text-black font-semibold px-6 py-3.5 rounded-2xl">Open the analyzer</a>
@@ -127,6 +135,8 @@
         </aside>
       </div>
     </section>
+
+    <!-- Value props -->
     <section class="border-y border-zinc-800 bg-zinc-900/40 py-10">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 grid sm:grid-cols-3 gap-8 text-center">
         <div>
@@ -143,6 +153,8 @@
         </div>
       </div>
     </section>
+
+    <!-- Analyzer -->
     <section id="forge" class="py-20">
       <div class="max-w-6xl mx-auto px-4 sm:px-6">
         <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
@@ -150,14 +162,16 @@
             <p class="text-amber-400 text-sm font-medium mb-1">Analyzer</p>
             <h2 class="heading text-3xl sm:text-4xl font-bold tracking-tight">Forge the deal</h2>
           </div>
-          <p class="text-sm text-zinc-500 max-w-sm">Pick a type. Enter the real numbers. Get a verdict you can save to the pipeline.</p>
+          <p class="text-sm text-zinc-500 max-w-sm">Pick a type. Enter the real numbers. Get a verdict you can save to the pipeline. Numbers update live.</p>
         </div>
+
         <div class="flex flex-wrap gap-2 mb-6" role="tablist" aria-label="Deal type">
-          <button type="button" class="type-btn px-4 py-2 rounded-xl text-sm font-medium bg-amber-400 text-black" data-type="flip">House flip</button>
-          <button type="button" class="type-btn px-4 py-2 rounded-xl text-sm font-medium bg-zinc-900 border border-zinc-800" data-type="wholesale">Wholesale</button>
-          <button type="button" class="type-btn px-4 py-2 rounded-xl text-sm font-medium bg-zinc-900 border border-zinc-800" data-type="pallet">Pallet / lot</button>
-          <button type="button" class="type-btn px-4 py-2 rounded-xl text-sm font-medium bg-zinc-900 border border-zinc-800" data-type="service">Service job</button>
+          <button type="button" class="type-btn px-4 py-2 rounded-xl text-sm font-medium bg-amber-400 text-black" data-type="flip" role="tab" aria-selected="true">House flip</button>
+          <button type="button" class="type-btn px-4 py-2 rounded-xl text-sm font-medium bg-zinc-900 border border-zinc-800" data-type="wholesale" role="tab" aria-selected="false">Wholesale</button>
+          <button type="button" class="type-btn px-4 py-2 rounded-xl text-sm font-medium bg-zinc-900 border border-zinc-800" data-type="pallet" role="tab" aria-selected="false">Pallet / lot</button>
+          <button type="button" class="type-btn px-4 py-2 rounded-xl text-sm font-medium bg-zinc-900 border border-zinc-800" data-type="service" role="tab" aria-selected="false">Service job</button>
         </div>
+
         <div class="grid lg:grid-cols-5 gap-6">
           <form id="deal-form" class="lg:col-span-3 bg-zinc-900 border border-zinc-800 rounded-3xl p-5 sm:p-7 space-y-4" novalidate>
             <div>
@@ -170,36 +184,51 @@
               <button type="button" id="save-deal" class="flex-1 border border-zinc-700 hover:border-amber-400 py-3 rounded-xl">Save to pipeline</button>
               <button type="button" id="reset-deal" class="sm:w-auto px-5 border border-zinc-800 text-zinc-400 py-3 rounded-xl">Reset</button>
             </div>
+            <p class="text-xs text-zinc-500 no-print">Tip: numbers update live. Ctrl + Enter also calculates.</p>
           </form>
-          <div class="lg:col-span-2 bg-zinc-900 border border-zinc-800 rounded-3xl p-5 sm:p-7" aria-live="polite">
-            <p class="text-xs uppercase tracking-wider text-zinc-500 mb-4">Verdict</p>
-            <div id="verdict" class="space-y-4">
-              <p class="text-zinc-500">Enter numbers and hit Calculate.</p>
+
+          <div class="lg:col-span-2 bg-zinc-900 border border-zinc-800 rounded-3xl p-5 sm:p-7 flex flex-col" aria-live="polite">
+            <div class="flex items-center justify-between mb-4">
+              <p class="text-xs uppercase tracking-wider text-zinc-500">Verdict</p>
+              <button type="button" id="print-deal" class="text-xs text-zinc-400 hover:text-amber-400 no-print hidden">Print sheet</button>
+            </div>
+            <div id="verdict" class="space-y-4 flex-1">
+              <p class="text-zinc-500">Enter numbers and hit Calculate — or just type and watch it update.</p>
             </div>
           </div>
         </div>
       </div>
     </section>
+
+    <!-- Pipeline -->
     <section id="pipeline" class="py-20 border-t border-zinc-800 bg-zinc-900/30">
       <div class="max-w-6xl mx-auto px-4 sm:px-6">
-        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
           <div>
             <p class="text-amber-400 text-sm font-medium mb-1">Pipeline</p>
             <h2 class="heading text-3xl sm:text-4xl font-bold tracking-tight">Deals on the board</h2>
           </div>
-          <div class="flex gap-2 no-print">
-            <button type="button" id="seed-demo" class="text-sm border border-zinc-700 px-3 py-2 rounded-xl">Load sample deals</button>
+          <div class="flex flex-wrap gap-2 no-print">
+            <button type="button" id="export-json" class="text-sm border border-zinc-700 px-3 py-2 rounded-xl hover:border-amber-400">Export JSON</button>
+            <button type="button" id="export-csv" class="text-sm border border-zinc-700 px-3 py-2 rounded-xl hover:border-amber-400">Export CSV</button>
+            <button type="button" id="seed-demo" class="text-sm border border-zinc-700 px-3 py-2 rounded-xl">Load samples</button>
             <button type="button" id="clear-board" class="text-sm border border-zinc-800 text-zinc-400 px-3 py-2 rounded-xl">Clear board</button>
           </div>
         </div>
+
+        <!-- Stats bar -->
+        <div id="pipeline-stats" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 text-sm"></div>
+
         <div id="board" class="grid md:grid-cols-4 gap-4"></div>
         <p id="board-empty" class="text-zinc-500 text-sm mt-4 hidden">No deals yet. Analyze one and save it, or load samples.</p>
       </div>
     </section>
+
+    <!-- Pricing -->
     <section id="pricing" class="py-20">
       <div class="max-w-6xl mx-auto px-4 sm:px-6">
         <h2 class="heading text-3xl sm:text-4xl font-bold tracking-tight text-center mb-3">Simple pricing</h2>
-        <p class="text-center text-zinc-400 mb-10">The core tools stay free. Pro is for operators who want saved cloud sync later.</p>
+        <p class="text-center text-zinc-400 mb-10">The core tools stay free. Pro is for operators who want cloud sync later.</p>
         <div class="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
           <article class="border border-zinc-800 rounded-3xl p-8 bg-zinc-900">
             <h3 class="heading text-2xl font-semibold">Forge</h3>
@@ -208,6 +237,7 @@
               <li>4 deal analyzers</li>
               <li>Local pipeline board</li>
               <li>Go / no-go + max offer</li>
+              <li>Export JSON & CSV</li>
               <li>Runs in any browser</li>
             </ul>
             <a href="#forge" class="block text-center bg-zinc-800 hover:bg-zinc-700 rounded-xl py-3 font-medium">Use it now</a>
@@ -226,13 +256,15 @@
         </div>
       </div>
     </section>
+
+    <!-- FAQ -->
     <section id="faq" class="py-20 border-t border-zinc-800">
       <div class="max-w-3xl mx-auto px-4 sm:px-6">
         <h2 class="heading text-3xl font-bold tracking-tight mb-8">FAQ</h2>
         <dl class="space-y-6 text-sm">
           <div>
             <dt class="heading text-lg font-semibold">Where is my data stored?</dt>
-            <dd class="text-zinc-400 mt-1">On this device, in localStorage. Clearing site data wipes the board. Export is on the roadmap.</dd>
+            <dd class="text-zinc-400 mt-1">On this device, in localStorage. Clearing site data wipes the board. Export JSON or CSV anytime.</dd>
           </div>
           <div>
             <dt class="heading text-lg font-semibold">How is max offer calculated on a flip?</dt>
@@ -242,10 +274,15 @@
             <dt class="heading text-lg font-semibold">Is this financial advice?</dt>
             <dd class="text-zinc-400 mt-1">No. It is a calculator. You still verify comps, repairs, and title.</dd>
           </div>
+          <div>
+            <dt class="heading text-lg font-semibold">Can I edit a saved deal?</dt>
+            <dd class="text-zinc-400 mt-1">Yes. Click any deal card in the pipeline. It loads back into the analyzer so you can tweak and re-save.</dd>
+          </div>
         </dl>
       </div>
     </section>
   </main>
+
   <footer class="border-t border-zinc-800 py-12 text-sm text-zinc-500">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row justify-between gap-6">
       <div>
@@ -256,10 +293,12 @@
       <p>© 2026 Deal Forge. Tools only. You own the risk.</p>
     </div>
   </footer>
+
+  <!-- Waitlist modal -->
   <div id="beta-modal" class="hidden fixed inset-0 z-[70] bg-black/75 items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="beta-title">
     <div class="bg-zinc-900 border border-zinc-700 rounded-3xl p-8 max-w-md w-full">
       <h3 id="beta-title" class="heading text-2xl font-semibold mb-2">Pro waitlist</h3>
-      <p class="text-zinc-400 text-sm mb-6">Leave a name and email. Stored on this device for now. Wire a form endpoint when you are ready.</p>
+      <p class="text-zinc-400 text-sm mb-6">Leave a name and email. Stored on this device for now.</p>
       <form id="beta-form" class="space-y-4">
         <div>
           <label for="beta-name" class="block text-sm mb-1">Name</label>
@@ -275,13 +314,40 @@
       </form>
     </div>
   </div>
+
   <script>
     const SCHEMAS = {
-      flip: [["arv","After repair value (ARV)",220000],["repairs","Repairs",28000],["holding","Holding costs",4500],["buyClose","Buy closing costs",3200],["sellClose","Sell closing costs",11900],["profit","Target profit",30000]],
-      wholesale: [["arv","ARV",220000],["repairs","Buyer repair budget",28000],["buyerProfit","Buyer target profit",25000],["assignFee","Your assignment fee",8000],["closePct","Buyer close + hold estimate",15000]],
-      pallet: [["buy","Lot buy price",420],["units","Sellable units",48],["sellEach","Sell price each",18],["fees","Fees + shipping",85],["deadPct","Dead stock %",12]],
-      service: [["hours","Labor hours",6],["rate","Hourly rate you want",95],["materials","Materials",140],["markup","Material markup %",25],["overhead","Trip / overhead",45]]
+      flip: [
+        ["arv", "After repair value (ARV)", 220000],
+        ["repairs", "Repairs", 28000],
+        ["holding", "Holding costs", 4500],
+        ["buyClose", "Buy closing costs", 3200],
+        ["sellClose", "Sell closing costs", 11900],
+        ["profit", "Target profit", 30000]
+      ],
+      wholesale: [
+        ["arv", "ARV", 220000],
+        ["repairs", "Buyer repair budget", 28000],
+        ["buyerProfit", "Buyer target profit", 25000],
+        ["assignFee", "Your assignment fee", 8000],
+        ["closePct", "Buyer close + hold estimate", 15000]
+      ],
+      pallet: [
+        ["buy", "Lot buy price", 420],
+        ["units", "Sellable units", 48],
+        ["sellEach", "Sell price each", 18],
+        ["fees", "Fees + shipping", 85],
+        ["deadPct", "Dead stock %", 12]
+      ],
+      service: [
+        ["hours", "Labor hours", 6],
+        ["rate", "Hourly rate you want", 95],
+        ["materials", "Materials", 140],
+        ["markup", "Material markup %", 25],
+        ["overhead", "Trip / overhead", 45]
+      ]
     };
+
     const LABELS = { flip: "House flip", wholesale: "Wholesale", pallet: "Pallet / lot", service: "Service job" };
     const STATUSES = ["watch", "offer", "contract", "closed"];
     const STATUS_LABEL = { watch: "Watch", offer: "Offer", contract: "Under contract", closed: "Closed" };
@@ -290,17 +356,29 @@
     const KEY = "dealforge.v2.pipeline";
     const WAIT_KEY = "dealforge.v2.waitlist";
     const $ = (id) => document.getElementById(id);
+
     const money = (n) => (n < 0 ? "-" : "") + "$" + Math.abs(Math.round(n)).toLocaleString();
     const pct = (n) => (isFinite(n) ? (n * 100).toFixed(1) + "%" : "—");
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&", "<": "<", ">": ">", '"': """, "'": "&#39;" }[c]));
+    }
+
     function renderFields() {
       const wrap = $("fields");
       wrap.innerHTML = SCHEMAS[currentType].map(([key, label, def]) => `
         <div>
           <label for="f-${key}" class="block text-sm text-zinc-400 mb-1">${label}</label>
           <input id="f-${key}" name="${key}" type="number" inputmode="decimal" step="any" min="0" value="${def}"
-            class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-400">
+            class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-400 field-input">
         </div>`).join("");
+
+      // Live calc listeners
+      wrap.querySelectorAll(".field-input").forEach((inp) => {
+        inp.addEventListener("input", debounceLiveCalc);
+      });
     }
+
     function readInputs() {
       const data = {};
       SCHEMAS[currentType].forEach(([key]) => {
@@ -312,6 +390,7 @@
       data.type = currentType;
       return data;
     }
+
     function analyze(d) {
       let maxOffer = 0, profit = 0, invested = 0, roi = 0, notes = [];
       if (d.type === "flip") {
@@ -319,14 +398,22 @@
         invested = maxOffer + d.repairs + d.holding + d.buyClose;
         profit = d.profit;
         roi = invested > 0 ? profit / invested : 0;
-        notes = [["ARV", money(d.arv)], ["All-in if you pay max", money(invested + d.sellClose)], ["70% rule check", money(d.arv * 0.7 - d.repairs)]];
+        notes = [
+          ["ARV", money(d.arv)],
+          ["All-in if you pay max", money(invested + d.sellClose)],
+          ["70% rule check", money(d.arv * 0.7 - d.repairs)]
+        ];
       } else if (d.type === "wholesale") {
         const buyerMax = d.arv - d.repairs - d.buyerProfit - d.closePct;
         maxOffer = buyerMax - d.assignFee;
         profit = d.assignFee;
         invested = 0;
         roi = Infinity;
-        notes = [["Buyer max purchase", money(buyerMax)], ["Your contract price", money(maxOffer)], ["Assignment fee", money(d.assignFee)]];
+        notes = [
+          ["Buyer max purchase", money(buyerMax)],
+          ["Your contract price", money(maxOffer)],
+          ["Assignment fee", money(d.assignFee)]
+        ];
       } else if (d.type === "pallet") {
         const live = d.units * (1 - d.deadPct / 100);
         const revenue = live * d.sellEach;
@@ -334,7 +421,11 @@
         profit = revenue - invested;
         maxOffer = Math.max(0, revenue - d.fees - invested * 0.35);
         roi = invested > 0 ? profit / invested : 0;
-        notes = [["Expected revenue", money(revenue)], ["Live units", Math.round(live).toString()], ["Break-even sell-each", money(live ? invested / live : 0)]];
+        notes = [
+          ["Expected revenue", money(revenue)],
+          ["Live units", Math.round(live).toString()],
+          ["Break-even sell-each", money(live ? invested / live : 0)]
+        ];
       } else {
         const mat = d.materials * (1 + d.markup / 100);
         const quote = d.hours * d.rate + mat + d.overhead;
@@ -342,13 +433,19 @@
         profit = quote - (d.materials + d.overhead);
         maxOffer = quote;
         roi = invested > 0 ? profit / invested : 0;
-        notes = [["Customer quote", money(quote)], ["Labor line", money(d.hours * d.rate)], ["Materials after markup", money(mat)]];
+        notes = [
+          ["Customer quote", money(quote)],
+          ["Labor line", money(d.hours * d.rate)],
+          ["Materials after markup", money(mat)]
+        ];
       }
       const go = profit > 0 && (d.type === "wholesale" || d.type === "service" || roi >= 0.15) && maxOffer >= 0;
       return { ...d, maxOffer, profit, invested, roi, notes, go, id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6) };
     }
+
     function renderVerdict(r) {
       lastResult = r;
+      $("print-deal").classList.remove("hidden");
       $("verdict").innerHTML = `
         <div class="flex items-start justify-between gap-3">
           <div>
@@ -364,17 +461,57 @@
         <ul class="text-sm space-y-1 text-zinc-300">
           ${r.notes.map(([k, v]) => `<li class="flex justify-between gap-3"><span class="text-zinc-500">${k}</span><span>${v}</span></li>`).join("")}
         </ul>
-        <p class="text-xs text-zinc-500">${r.name} · ${LABELS[r.type]}</p>`;
+        <p class="text-xs text-zinc-500">${escapeHtml(r.name)} · ${LABELS[r.type]}</p>`;
     }
-    function loadBoard() { try { return JSON.parse(localStorage.getItem(KEY) || "[]"); } catch { return []; } }
-    function saveBoard(rows) { localStorage.setItem(KEY, JSON.stringify(rows)); }
-    function escapeHtml(s) {
-      return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&", "<": "<", ">": ">", '"': """, "'": "&#39;" }[c]));
+
+    let liveTimer = null;
+    function debounceLiveCalc() {
+      clearTimeout(liveTimer);
+      liveTimer = setTimeout(() => {
+        const data = readInputs();
+        // Only auto-render if at least one meaningful number exists
+        const hasNums = Object.values(data).some(v => typeof v === "number" && v > 0);
+        if (hasNums) renderVerdict(analyze(data));
+      }, 280);
     }
+
+    function loadBoard() {
+      try { return JSON.parse(localStorage.getItem(KEY) || "[]"); } catch { return []; }
+    }
+    function saveBoard(rows) {
+      localStorage.setItem(KEY, JSON.stringify(rows));
+    }
+
+    function renderStats(rows) {
+      const total = rows.length;
+      const goCount = rows.filter(d => d.go).length;
+      const avgOffer = total ? Math.round(rows.reduce((s, d) => s + (d.maxOffer || 0), 0) / total) : 0;
+      const closed = rows.filter(d => d.status === "closed").length;
+      $("pipeline-stats").innerHTML = `
+        <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-center">
+          <p class="text-zinc-500 text-xs">Total deals</p>
+          <p class="heading text-xl font-semibold">${total}</p>
+        </div>
+        <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-center">
+          <p class="text-zinc-500 text-xs">GO rate</p>
+          <p class="heading text-xl font-semibold">${total ? Math.round((goCount / total) * 100) : 0}%</p>
+        </div>
+        <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-center">
+          <p class="text-zinc-500 text-xs">Avg max offer</p>
+          <p class="heading text-xl font-semibold">${money(avgOffer)}</p>
+        </div>
+        <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-center">
+          <p class="text-zinc-500 text-xs">Closed</p>
+          <p class="heading text-xl font-semibold">${closed}</p>
+        </div>`;
+    }
+
     function renderBoard() {
       const rows = loadBoard();
       const board = $("board");
       $("board-empty").classList.toggle("hidden", rows.length > 0);
+      renderStats(rows);
+
       board.innerHTML = STATUSES.map((st) => {
         const col = rows.filter((d) => d.status === st);
         return `
@@ -382,20 +519,22 @@
             <h3 class="text-xs uppercase tracking-wider text-zinc-500 mb-3">${STATUS_LABEL[st]} · ${col.length}</h3>
             <div class="space-y-2">
               ${col.map((d) => `
-                <article class="deal-card bg-zinc-900 border border-zinc-800 rounded-xl p-3">
+                <article class="deal-card bg-zinc-900 border border-zinc-800 rounded-xl p-3 cursor-pointer" data-load-id="${d.id}" tabindex="0" role="button" aria-label="Load ${escapeHtml(d.name)} into analyzer">
                   <p class="font-medium text-sm truncate">${escapeHtml(d.name)}</p>
                   <p class="text-amber-400 text-sm">${money(d.maxOffer)}</p>
                   <p class="text-xs text-zinc-500">${LABELS[d.type] || d.type} · ${d.go ? "GO" : "NO-GO"}</p>
                   <label class="sr-only" for="st-${d.id}">Move ${escapeHtml(d.name)}</label>
-                  <select id="st-${d.id}" data-id="${d.id}" class="status-sel mt-2 w-full bg-zinc-950 border border-zinc-800 rounded-lg text-xs px-2 py-1">
+                  <select id="st-${d.id}" data-id="${d.id}" class="status-sel mt-2 w-full bg-zinc-950 border border-zinc-800 rounded-lg text-xs px-2 py-1" onclick="event.stopPropagation()">
                     ${STATUSES.map((s) => `<option value="${s}" ${s === d.status ? "selected" : ""}>${STATUS_LABEL[s]}</option>`).join("")}
                   </select>
-                  <button type="button" data-del="${d.id}" class="del-btn mt-2 text-xs text-zinc-500 hover:text-red-400">Remove</button>
+                  <button type="button" data-del="${d.id}" class="del-btn mt-2 text-xs text-zinc-500 hover:text-red-400" onclick="event.stopPropagation()">Remove</button>
                 </article>`).join("")}
             </div>
           </section>`;
       }).join("");
     }
+
+    // Type buttons
     document.querySelectorAll(".type-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         currentType = btn.dataset.type;
@@ -406,42 +545,97 @@
           b.classList.toggle("bg-zinc-900", !on);
           b.classList.toggle("border", !on);
           b.classList.toggle("border-zinc-800", !on);
+          b.setAttribute("aria-selected", on ? "true" : "false");
         });
         renderFields();
         lastResult = null;
-        $("verdict").innerHTML = '<p class="text-zinc-500">Enter numbers and hit Calculate.</p>';
+        $("print-deal").classList.add("hidden");
+        $("verdict").innerHTML = '<p class="text-zinc-500">Enter numbers and hit Calculate — or just type and watch it update.</p>';
       });
     });
+
     $("deal-form").addEventListener("submit", (e) => {
       e.preventDefault();
       renderVerdict(analyze(readInputs()));
     });
+
     $("save-deal").addEventListener("click", () => {
       if (!lastResult) renderVerdict(analyze(readInputs()));
       const rows = loadBoard();
-      rows.unshift({ ...lastResult, status: lastResult.go ? "offer" : "watch" });
+      // If editing an existing id, replace it
+      const existingIdx = rows.findIndex(r => r.id === lastResult.id);
+      const entry = { ...lastResult, status: lastResult.go ? "offer" : "watch" };
+      if (existingIdx >= 0) {
+        rows[existingIdx] = entry;
+      } else {
+        rows.unshift(entry);
+      }
       saveBoard(rows);
       renderBoard();
       document.getElementById("pipeline").scrollIntoView({ behavior: "smooth" });
     });
+
     $("reset-deal").addEventListener("click", () => {
       $("deal-name").value = "";
       renderFields();
       lastResult = null;
-      $("verdict").innerHTML = '<p class="text-zinc-500">Enter numbers and hit Calculate.</p>';
+      $("print-deal").classList.add("hidden");
+      $("verdict").innerHTML = '<p class="text-zinc-500">Enter numbers and hit Calculate — or just type and watch it update.</p>';
     });
+
+    // Load deal from card
+    $("board").addEventListener("click", (e) => {
+      const card = e.target.closest("[data-load-id]");
+      if (!card || e.target.classList.contains("status-sel") || e.target.classList.contains("del-btn")) return;
+      const id = card.dataset.loadId;
+      const deal = loadBoard().find(d => d.id === id);
+      if (!deal) return;
+
+      currentType = deal.type;
+      document.querySelectorAll(".type-btn").forEach((b) => {
+        const on = b.dataset.type === currentType;
+        b.classList.toggle("bg-amber-400", on);
+        b.classList.toggle("text-black", on);
+        b.classList.toggle("bg-zinc-900", !on);
+        b.classList.toggle("border", !on);
+        b.classList.toggle("border-zinc-800", !on);
+        b.setAttribute("aria-selected", on ? "true" : "false");
+      });
+      renderFields();
+      $("deal-name").value = deal.name || "";
+      SCHEMAS[currentType].forEach(([key]) => {
+        const el = document.getElementById("f-" + key);
+        if (el && deal[key] !== undefined) el.value = deal[key];
+      });
+      lastResult = deal;
+      renderVerdict(deal);
+      document.getElementById("forge").scrollIntoView({ behavior: "smooth" });
+    });
+
+    $("board").addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        const card = e.target.closest("[data-load-id]");
+        if (card) {
+          e.preventDefault();
+          card.click();
+        }
+      }
+    });
+
     $("board").addEventListener("change", (e) => {
       if (!e.target.classList.contains("status-sel")) return;
       const rows = loadBoard().map((d) => d.id === e.target.dataset.id ? { ...d, status: e.target.value } : d);
       saveBoard(rows);
       renderBoard();
     });
+
     $("board").addEventListener("click", (e) => {
       const id = e.target.dataset.del;
       if (!id) return;
       saveBoard(loadBoard().filter((d) => d.id !== id));
       renderBoard();
     });
+
     $("seed-demo").addEventListener("click", () => {
       const samples = [
         analyze({ type: "flip", name: "124 Oak St, Taylor", arv: 220000, repairs: 28000, holding: 4500, buyClose: 3200, sellClose: 11900, profit: 30000 }),
@@ -452,9 +646,63 @@
       saveBoard(samples);
       renderBoard();
     });
+
     $("clear-board").addEventListener("click", () => {
-      if (confirm("Clear every deal on this device?")) { saveBoard([]); renderBoard(); }
+      if (confirm("Clear every deal on this device?")) {
+        saveBoard([]);
+        renderBoard();
+      }
     });
+
+    // Export
+    $("export-json").addEventListener("click", () => {
+      const data = loadBoard();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "deal-forge-pipeline.json";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+
+    $("export-csv").addEventListener("click", () => {
+      const rows = loadBoard();
+      if (!rows.length) return;
+      const headers = ["name", "type", "status", "maxOffer", "profit", "roi", "go"];
+      const lines = [headers.join(",")];
+      rows.forEach(r => {
+        lines.push([
+          `"${(r.name || "").replace(/"/g, '""')}"`,
+          r.type,
+          r.status,
+          r.maxOffer,
+          r.profit,
+          isFinite(r.roi) ? r.roi : "",
+          r.go
+        ].join(","));
+      });
+      const blob = new Blob([lines.join("\n")], { type: "text/csv" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "deal-forge-pipeline.csv";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+
+    // Print
+    $("print-deal").addEventListener("click", () => {
+      window.print();
+    });
+
+    // Keyboard
+    document.addEventListener("keydown", (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+        e.preventDefault();
+        renderVerdict(analyze(readInputs()));
+      }
+    });
+
+    // Mobile menu
     const menuBtn = $("menu-btn");
     const mobile = $("mobile-menu");
     menuBtn.addEventListener("click", () => {
@@ -465,13 +713,23 @@
       mobile.classList.add("hidden");
       menuBtn.setAttribute("aria-expanded", "false");
     }));
+
+    // Modal
     const modal = $("beta-modal");
-    function openModal() { modal.classList.remove("hidden"); modal.classList.add("flex"); $("beta-name").focus(); }
-    function closeModal() { modal.classList.add("hidden"); modal.classList.remove("flex"); }
+    function openModal() {
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      $("beta-name").focus();
+    }
+    function closeModal() {
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
     $("open-beta").addEventListener("click", openModal);
     $("close-beta").addEventListener("click", closeModal);
     modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+
     $("beta-form").addEventListener("submit", (e) => {
       e.preventDefault();
       const entry = { name: $("beta-name").value.trim(), email: $("beta-email").value.trim(), at: new Date().toISOString() };
@@ -482,6 +740,8 @@
       $("beta-msg").classList.remove("hidden");
       $("beta-form").reset();
     });
+
+    // Init
     renderFields();
     renderBoard();
   </script>
