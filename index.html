@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Deal Forge — Analyze any deal. Know the max offer.</title>
-  <meta name="description" content="Deal Forge is a free deal intelligence tool for flips, wholesale, pallets, and service jobs. Run the numbers, get a max offer, and track your pipeline.">
+  <meta name="description" content="Deal Forge is a free deal intelligence tool for flips, wholesale, rentals, pallets, and service jobs. Run the numbers, get a max offer, score, and offer letter.">
   <meta name="theme-color" content="#09090b">
   <link rel="canonical" href="https://bet34.github.io/deal-forge-website/">
   <meta property="og:title" content="Deal Forge — Analyze any deal. Know the max offer.">
-  <meta property="og:description" content="Free deal analyzer and pipeline tracker. Flip, wholesale, pallet, or service job — get profit, ROI, and a go / no-go in seconds.">
+  <meta property="og:description" content="Free deal analyzer and pipeline. Flip, wholesale, rental, pallet, or service job. Score, max offer, and a copy-ready offer letter.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://bet34.github.io/deal-forge-website/">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -16,9 +16,7 @@
     tailwind.config = {
       theme: {
         extend: {
-          colors: {
-            forge: { ember: "#f59e0b", steel: "#71717a", ink: "#09090b" }
-          },
+          colors: { forge: { ember: "#f59e0b", ink: "#09090b" } },
           fontFamily: {
             display: ["Space Grotesk", "Inter", "system-ui", "sans-serif"],
             sans: ["Inter", "system-ui", "sans-serif"]
@@ -37,15 +35,15 @@
     .ember-ring { box-shadow: 0 0 0 1px rgba(245,158,11,.25), 0 20px 50px -20px rgba(245,158,11,.25); }
     input[type=number]::-webkit-outer-spin-button,
     input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-    input[type=number] { -moz-appearance: textfield; }
-    .deal-card:focus-within { outline: 2px solid #f59e0b; outline-offset: 2px; }
+    input[type=number] { -moz-appearance: textfield; appearance: textfield; }
     .deal-card { transition: border-color .15s ease, transform .15s ease; }
     .deal-card:hover { border-color: #52525b; }
+    .deal-card:focus-within { outline: 2px solid #f59e0b; outline-offset: 2px; }
     button, a, select, input { transition: all .15s ease; }
     @media print {
       nav, footer, #beta-modal, .no-print { display: none !important; }
       body { background: #fff; color: #111; }
-      #verdict { border: 1px solid #ccc; padding: 1rem; }
+      #verdict { border: 1px solid #ccc; }
     }
   </style>
   <script type="application/ld+json">
@@ -56,7 +54,7 @@
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Web",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-    "description": "Deal analyzer and pipeline tracker for flips, wholesale, inventory, and service jobs.",
+    "description": "Deal analyzer and pipeline tracker for flips, wholesale, rentals, inventory, and service jobs.",
     "url": "https://bet34.github.io/deal-forge-website/"
   }
   </script>
@@ -73,6 +71,7 @@
       <div class="hidden md:flex items-center gap-7 text-sm text-zinc-300">
         <a href="#forge" class="hover:text-amber-400">Analyzer</a>
         <a href="#pipeline" class="hover:text-amber-400">Pipeline</a>
+        <a href="#math" class="hover:text-amber-400">Math</a>
         <a href="#pricing" class="hover:text-amber-400">Pricing</a>
         <a href="#faq" class="hover:text-amber-400">FAQ</a>
       </div>
@@ -86,13 +85,13 @@
     <div id="mobile-menu" class="hidden md:hidden border-t border-zinc-800 bg-zinc-950 px-4 py-3 space-y-2 text-sm">
       <a href="#forge" class="block py-2">Analyzer</a>
       <a href="#pipeline" class="block py-2">Pipeline</a>
+      <a href="#math" class="block py-2">Math</a>
       <a href="#pricing" class="block py-2">Pricing</a>
       <a href="#faq" class="block py-2">FAQ</a>
     </div>
   </nav>
 
   <main id="main">
-    <!-- Hero -->
     <section id="top" class="pt-28 pb-16 sm:pt-32 sm:pb-24">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-12 items-center">
         <div>
@@ -105,14 +104,14 @@
             <span class="text-amber-400">Know the max offer.</span>
           </h1>
           <p class="text-lg text-zinc-400 max-w-xl mb-8">
-            Deal Forge turns a flip, wholesale contract, pallet lot, or service job into profit, ROI, and a clear go / no-go. Built for operators who still live in spreadsheets.
+            Deal Forge turns a flip, wholesale contract, rental, pallet lot, or service job into profit, a 0–100 score, and a copy-ready offer. Built for operators who still live in spreadsheets.
           </p>
           <div class="flex flex-col sm:flex-row gap-3">
             <a href="#forge" class="inline-flex justify-center items-center gap-2 bg-amber-400 hover:bg-amber-300 text-black font-semibold px-6 py-3.5 rounded-2xl">Open the analyzer</a>
             <a href="#pipeline" class="inline-flex justify-center items-center gap-2 border border-zinc-700 hover:border-zinc-400 px-6 py-3.5 rounded-2xl">See the pipeline</a>
           </div>
           <dl class="mt-10 grid grid-cols-3 gap-4 max-w-md text-sm">
-            <div><dt class="text-zinc-500">Deal types</dt><dd class="heading text-2xl font-semibold">4</dd></div>
+            <div><dt class="text-zinc-500">Deal types</dt><dd class="heading text-2xl font-semibold">5</dd></div>
             <div><dt class="text-zinc-500">Saves on device</dt><dd class="heading text-2xl font-semibold">Yes</dd></div>
             <div><dt class="text-zinc-500">Price to start</dt><dd class="heading text-2xl font-semibold">$0</dd></div>
           </dl>
@@ -124,7 +123,7 @@
               <p class="text-zinc-400 text-sm">Max offer</p>
               <p class="heading text-4xl font-bold text-amber-400">$142,400</p>
             </div>
-            <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-400">GO</span>
+            <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-400">GO · 78</span>
           </div>
           <ul class="grid grid-cols-2 gap-3 text-sm">
             <li class="bg-zinc-950 rounded-xl p-3"><span class="block text-zinc-500">ARV</span>$220,000</li>
@@ -136,25 +135,23 @@
       </div>
     </section>
 
-    <!-- Value props -->
     <section class="border-y border-zinc-800 bg-zinc-900/40 py-10">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 grid sm:grid-cols-3 gap-8 text-center">
         <div>
           <h2 class="heading text-lg font-semibold mb-1">Stop guessing the offer</h2>
-          <p class="text-sm text-zinc-400">Max bid is the leftover after repairs, hold, close, and the profit you actually need.</p>
+          <p class="text-sm text-zinc-400">Max bid is the leftover after repairs, hold, close, debt, and the profit you actually need.</p>
         </div>
         <div>
-          <h2 class="heading text-lg font-semibold mb-1">One board for every deal</h2>
-          <p class="text-sm text-zinc-400">Save analyzed deals to a local pipeline. Watch, offer, under contract, closed.</p>
+          <h2 class="heading text-lg font-semibold mb-1">Score, then stress it</h2>
+          <p class="text-sm text-zinc-400">0–100 deal score. Slide a haircut on ARV, rent, or sell price and watch the verdict move.</p>
         </div>
         <div>
-          <h2 class="heading text-lg font-semibold mb-1">Works offline after load</h2>
-          <p class="text-sm text-zinc-400">Numbers live in your browser. Nothing is sent to a server.</p>
+          <h2 class="heading text-lg font-semibold mb-1">Letter ready to send</h2>
+          <p class="text-sm text-zinc-400">Copy an offer or quote. Board stays on this device. Nothing is sent to a server.</p>
         </div>
       </div>
     </section>
 
-    <!-- Analyzer -->
     <section id="forge" class="py-20">
       <div class="max-w-6xl mx-auto px-4 sm:px-6">
         <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
@@ -162,12 +159,13 @@
             <p class="text-amber-400 text-sm font-medium mb-1">Analyzer</p>
             <h2 class="heading text-3xl sm:text-4xl font-bold tracking-tight">Forge the deal</h2>
           </div>
-          <p class="text-sm text-zinc-500 max-w-sm">Pick a type. Enter the real numbers. Get a verdict you can save to the pipeline. Numbers update live.</p>
+          <p class="text-sm text-zinc-500 max-w-sm">Pick a type. Enter the real numbers. Get a score, a max offer, and a letter you can copy.</p>
         </div>
 
         <div class="flex flex-wrap gap-2 mb-6" role="tablist" aria-label="Deal type">
           <button type="button" class="type-btn px-4 py-2 rounded-xl text-sm font-medium bg-amber-400 text-black" data-type="flip" role="tab" aria-selected="true">House flip</button>
           <button type="button" class="type-btn px-4 py-2 rounded-xl text-sm font-medium bg-zinc-900 border border-zinc-800" data-type="wholesale" role="tab" aria-selected="false">Wholesale</button>
+          <button type="button" class="type-btn px-4 py-2 rounded-xl text-sm font-medium bg-zinc-900 border border-zinc-800" data-type="rental" role="tab" aria-selected="false">Rental</button>
           <button type="button" class="type-btn px-4 py-2 rounded-xl text-sm font-medium bg-zinc-900 border border-zinc-800" data-type="pallet" role="tab" aria-selected="false">Pallet / lot</button>
           <button type="button" class="type-btn px-4 py-2 rounded-xl text-sm font-medium bg-zinc-900 border border-zinc-800" data-type="service" role="tab" aria-selected="false">Service job</button>
         </div>
@@ -179,12 +177,20 @@
               <input id="deal-name" name="name" type="text" maxlength="80" placeholder="124 Oak St, Taylor" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-400" autocomplete="off">
             </div>
             <div id="fields" class="grid sm:grid-cols-2 gap-4"></div>
+            <div>
+              <div class="flex items-center justify-between text-sm text-zinc-400 mb-1">
+                <label for="stress">Stress haircut</label>
+                <span id="stress-label">0%</span>
+              </div>
+              <input id="stress" type="range" min="0" max="20" step="1" value="0" class="w-full accent-amber-400" aria-describedby="stress-help">
+              <p id="stress-help" class="text-xs text-zinc-500 mt-1">Cuts ARV, rent, or sell price. Shows if the deal still works when the number is wrong.</p>
+            </div>
             <div class="flex flex-col sm:flex-row gap-3 pt-2 no-print">
               <button type="submit" class="flex-1 bg-amber-400 hover:bg-amber-300 text-black font-semibold py-3 rounded-xl">Calculate</button>
               <button type="button" id="save-deal" class="flex-1 border border-zinc-700 hover:border-amber-400 py-3 rounded-xl">Save to pipeline</button>
               <button type="button" id="reset-deal" class="sm:w-auto px-5 border border-zinc-800 text-zinc-400 py-3 rounded-xl">Reset</button>
             </div>
-            <p class="text-xs text-zinc-500 no-print">Tip: numbers update live. Ctrl + Enter also calculates.</p>
+            <p class="text-xs text-zinc-500 no-print">Numbers update as you type. Ctrl + Enter also calculates.</p>
           </form>
 
           <div class="lg:col-span-2 bg-zinc-900 border border-zinc-800 rounded-3xl p-5 sm:p-7 flex flex-col" aria-live="polite">
@@ -200,7 +206,6 @@
       </div>
     </section>
 
-    <!-- Pipeline -->
     <section id="pipeline" class="py-20 border-t border-zinc-800 bg-zinc-900/30">
       <div class="max-w-6xl mx-auto px-4 sm:px-6">
         <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
@@ -211,21 +216,51 @@
           <div class="flex flex-wrap gap-2 no-print">
             <button type="button" id="export-json" class="text-sm border border-zinc-700 px-3 py-2 rounded-xl hover:border-amber-400">Export JSON</button>
             <button type="button" id="export-csv" class="text-sm border border-zinc-700 px-3 py-2 rounded-xl hover:border-amber-400">Export CSV</button>
+            <label class="text-sm border border-zinc-700 px-3 py-2 rounded-xl hover:border-amber-400 cursor-pointer">
+              Import JSON
+              <input id="import-json" type="file" accept="application/json,.json" class="sr-only">
+            </label>
             <button type="button" id="seed-demo" class="text-sm border border-zinc-700 px-3 py-2 rounded-xl">Load samples</button>
             <button type="button" id="clear-board" class="text-sm border border-zinc-800 text-zinc-400 px-3 py-2 rounded-xl">Clear board</button>
           </div>
         </div>
-
-        <!-- Stats bar -->
+        <div class="mb-4 no-print">
+          <label for="board-search" class="sr-only">Search deals</label>
+          <input id="board-search" type="search" placeholder="Search name or type" class="w-full sm:max-w-xs bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-amber-400">
+        </div>
         <div id="pipeline-stats" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 text-sm"></div>
-
         <div id="board" class="grid md:grid-cols-4 gap-4"></div>
         <p id="board-empty" class="text-zinc-500 text-sm mt-4 hidden">No deals yet. Analyze one and save it, or load samples.</p>
+        <p id="import-msg" class="text-sm text-emerald-400 mt-3 hidden" role="status"></p>
       </div>
     </section>
 
-    <!-- Pricing -->
-    <section id="pricing" class="py-20">
+    <section id="math" class="py-20 border-t border-zinc-800">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <p class="text-amber-400 text-sm font-medium mb-1">Math</p>
+        <h2 class="heading text-3xl sm:text-4xl font-bold tracking-tight mb-8">How the number is built</h2>
+        <div class="grid md:grid-cols-2 gap-4 text-sm">
+          <article class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+            <h3 class="heading text-lg font-semibold mb-2">Flip</h3>
+            <p class="text-zinc-400">Max offer = ARV − repairs − holding − buy close − sell close − target profit. Go needs profit and at least 15% ROI on cash in.</p>
+          </article>
+          <article class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+            <h3 class="heading text-lg font-semibold mb-2">Wholesale</h3>
+            <p class="text-zinc-400">Buyer max = ARV − repairs − buyer profit − close/hold. Your contract price is that number minus your assignment fee.</p>
+          </article>
+          <article class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+            <h3 class="heading text-lg font-semibold mb-2">Rental</h3>
+            <p class="text-zinc-400">NOI after vacancy and expenses. Cash-on-cash uses down payment. DSCR is NOI divided by yearly mortgage. Max price hunts for 8% CoC and 1.25 DSCR.</p>
+          </article>
+          <article class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+            <h3 class="heading text-lg font-semibold mb-2">Pallet and service</h3>
+            <p class="text-zinc-400">Pallet profit is live units times sell price, minus buy and fees. Service quote is labor plus marked-up materials plus trip cost.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="pricing" class="py-20 border-t border-zinc-800">
       <div class="max-w-6xl mx-auto px-4 sm:px-6">
         <h2 class="heading text-3xl sm:text-4xl font-bold tracking-tight text-center mb-3">Simple pricing</h2>
         <p class="text-center text-zinc-400 mb-10">The core tools stay free. Pro is for operators who want cloud sync later.</p>
@@ -234,10 +269,10 @@
             <h3 class="heading text-2xl font-semibold">Forge</h3>
             <p class="heading text-5xl font-bold my-4">$0</p>
             <ul class="space-y-2 text-sm text-zinc-300 mb-8">
-              <li>4 deal analyzers</li>
+              <li>5 deal analyzers</li>
+              <li>Score, stress haircut, offer letter</li>
               <li>Local pipeline board</li>
-              <li>Go / no-go + max offer</li>
-              <li>Export JSON & CSV</li>
+              <li>Export and import JSON, export CSV</li>
               <li>Runs in any browser</li>
             </ul>
             <a href="#forge" class="block text-center bg-zinc-800 hover:bg-zinc-700 rounded-xl py-3 font-medium">Use it now</a>
@@ -257,7 +292,6 @@
       </div>
     </section>
 
-    <!-- FAQ -->
     <section id="faq" class="py-20 border-t border-zinc-800">
       <div class="max-w-3xl mx-auto px-4 sm:px-6">
         <h2 class="heading text-3xl font-bold tracking-tight mb-8">FAQ</h2>
@@ -271,12 +305,16 @@
             <dd class="text-zinc-400 mt-1">ARV minus repairs, holding, buy close, sell close, and your target profit. That leftover is the most you should pay.</dd>
           </div>
           <div>
+            <dt class="heading text-lg font-semibold">What does the score mean?</dt>
+            <dd class="text-zinc-400 mt-1">0–100. Under 60 is a no-go. It mixes profit, ROI or cash-on-cash, and cushion versus a simple rule of thumb. It is not a guarantee.</dd>
+          </div>
+          <div>
             <dt class="heading text-lg font-semibold">Is this financial advice?</dt>
-            <dd class="text-zinc-400 mt-1">No. It is a calculator. You still verify comps, repairs, and title.</dd>
+            <dd class="text-zinc-400 mt-1">No. It is a calculator. You still verify comps, repairs, rent, and title.</dd>
           </div>
           <div>
             <dt class="heading text-lg font-semibold">Can I edit a saved deal?</dt>
-            <dd class="text-zinc-400 mt-1">Yes. Click any deal card in the pipeline. It loads back into the analyzer so you can tweak and re-save.</dd>
+            <dd class="text-zinc-400 mt-1">Yes. Click any deal card. It loads back into the analyzer so you can tweak and re-save.</dd>
           </div>
         </dl>
       </div>
@@ -288,15 +326,14 @@
       <div>
         <p class="heading text-zinc-200 text-lg mb-1">Deal Forge</p>
         <p>Downriver / Detroit Metro · Built by Bet34</p>
-        <p class="mt-2"><a class="hover:text-amber-400" href="https://github.com/Bet34/deal-forge-website">GitHub repo</a></p>
+        <p class="mt-2"><a class="hover:text-amber-400" href="https://github.com/Bet34/deal-forge-website">GitHub repo</a> · <a class="hover:text-amber-400" href="https://bet34.github.io/deal-forge-website/">Live site</a></p>
       </div>
       <p>© 2026 Deal Forge. Tools only. You own the risk.</p>
     </div>
   </footer>
 
-  <!-- Waitlist modal -->
-  <div id="beta-modal" class="hidden fixed inset-0 z-[70] bg-black/75 items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="beta-title">
-    <div class="bg-zinc-900 border border-zinc-700 rounded-3xl p-8 max-w-md w-full">
+  <div id="beta-modal" class="hidden fixed inset-0 z-[70] bg-black/70 items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="beta-title">
+    <div class="bg-zinc-900 border border-zinc-700 rounded-3xl p-6 sm:p-8 max-w-md w-full">
       <h3 id="beta-title" class="heading text-2xl font-semibold mb-2">Pro waitlist</h3>
       <p class="text-zinc-400 text-sm mb-6">Leave a name and email. Stored on this device for now.</p>
       <form id="beta-form" class="space-y-4">
@@ -332,6 +369,18 @@
         ["assignFee", "Your assignment fee", 8000],
         ["closePct", "Buyer close + hold estimate", 15000]
       ],
+      rental: [
+        ["price", "Asking price", 165000],
+        ["downPct", "Down payment %", 20],
+        ["rate", "Interest rate %", 7.25],
+        ["years", "Loan years", 30],
+        ["rent", "Monthly rent", 1650],
+        ["vacancyPct", "Vacancy %", 8],
+        ["taxes", "Taxes / year", 2400],
+        ["insurance", "Insurance / year", 1200],
+        ["maintenance", "Repairs + other / year", 1400],
+        ["mgmtPct", "Management % of rent", 0]
+      ],
       pallet: [
         ["buy", "Lot buy price", 420],
         ["units", "Sellable units", 48],
@@ -348,84 +397,133 @@
       ]
     };
 
-    const LABELS = { flip: "House flip", wholesale: "Wholesale", pallet: "Pallet / lot", service: "Service job" };
+    const LABELS = { flip: "House flip", wholesale: "Wholesale", rental: "Rental", pallet: "Pallet / lot", service: "Service job" };
     const STATUSES = ["watch", "offer", "contract", "closed"];
     const STATUS_LABEL = { watch: "Watch", offer: "Offer", contract: "Under contract", closed: "Closed" };
-    let currentType = "flip";
-    let lastResult = null;
     const KEY = "dealforge.v2.pipeline";
     const WAIT_KEY = "dealforge.v2.waitlist";
     const $ = (id) => document.getElementById(id);
 
-    const money = (n) => (n < 0 ? "-" : "") + "$" + Math.abs(Math.round(n)).toLocaleString();
-    const pct = (n) => (isFinite(n) ? (n * 100).toFixed(1) + "%" : "—");
+    let currentType = "flip";
+    let lastResult = null;
+    let editingId = null;
 
-    function escapeHtml(s) {
-      return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&", "<": "<", ">": ">", '"': """, "'": "&#39;" }[c]));
+    const money = (n) => (n < 0 ? "-" : "") + "$" + Math.abs(Math.round(n || 0)).toLocaleString();
+    const pct = (n) => (Number.isFinite(n) ? (n * 100).toFixed(1) + "%" : "—");
+    const escapeHtml = (s) => String(s || "").replace(/[&<>"']/g, (c) => ({ "&": "&", "<": "<", ">": ">", '"': """, "'": "&#39;" }[c]));
+    const num = (id) => {
+      const el = document.querySelector(`[data-field="${id}"]`);
+      const v = el ? parseFloat(el.value) : NaN;
+      return Number.isFinite(v) ? v : 0;
+    };
+    const haircut = () => 1 - (parseFloat($("stress").value) || 0) / 100;
+
+    function mortgagePayment(principal, annualRate, years) {
+      const n = Math.max(1, Math.round(years * 12));
+      const r = (annualRate / 100) / 12;
+      if (principal <= 0) return 0;
+      if (r === 0) return principal / n;
+      const pow = Math.pow(1 + r, n);
+      return principal * (r * pow) / (pow - 1);
     }
 
-    function renderFields() {
-      const wrap = $("fields");
-      wrap.innerHTML = SCHEMAS[currentType].map(([key, label, def]) => `
-        <div>
-          <label for="f-${key}" class="block text-sm text-zinc-400 mb-1">${label}</label>
-          <input id="f-${key}" name="${key}" type="number" inputmode="decimal" step="any" min="0" value="${def}"
-            class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-400 field-input">
-        </div>`).join("");
-
-      // Live calc listeners
-      wrap.querySelectorAll(".field-input").forEach((inp) => {
-        inp.addEventListener("input", debounceLiveCalc);
-      });
+    function rentalAtPrice(price, d, rentMonthly) {
+      const down = price * (d.downPct / 100);
+      const loan = Math.max(0, price - down);
+      const pmt = mortgagePayment(loan, d.rate, d.years);
+      const debt = pmt * 12;
+      const gross = rentMonthly * 12;
+      const egi = gross * (1 - d.vacancyPct / 100);
+      const opex = d.taxes + d.insurance + d.maintenance + egi * (d.mgmtPct / 100);
+      const noi = egi - opex;
+      const cash = noi - debt;
+      const coc = down > 0 ? cash / down : 0;
+      const dscr = debt > 0 ? noi / debt : Infinity;
+      const cap = price > 0 ? noi / price : 0;
+      return { down, loan, pmt, debt, egi, opex, noi, cash, coc, dscr, cap };
     }
 
-    function readInputs() {
-      const data = {};
-      SCHEMAS[currentType].forEach(([key]) => {
-        const raw = document.getElementById("f-" + key).value;
-        const n = parseFloat(raw);
-        data[key] = Number.isFinite(n) ? n : 0;
-      });
-      data.name = $("deal-name").value.trim() || (LABELS[currentType] + " deal");
-      data.type = currentType;
-      return data;
+    function maxRentalPrice(d, rentMonthly) {
+      let lo = 1000;
+      let hi = Math.max(rentMonthly * 12 * 20, 50000);
+      let best = 0;
+      for (let i = 0; i < 28; i++) {
+        const mid = (lo + hi) / 2;
+        const m = rentalAtPrice(mid, d, rentMonthly);
+        const ok = m.cash > 0 && m.coc >= 0.08 && (m.dscr === Infinity || m.dscr >= 1.25);
+        if (ok) { best = mid; lo = mid; } else { hi = mid; }
+      }
+      return best;
     }
+
+    function clampScore(n) { return Math.max(0, Math.min(100, Math.round(n))); }
 
     function analyze(d) {
-      let maxOffer = 0, profit = 0, invested = 0, roi = 0, notes = [];
+      const cut = d.stress == null ? haircut() : (1 - d.stress / 100);
+      let maxOffer = 0, profit = 0, invested = 0, roi = 0, notes = [], score = 0, letter = "";
+      const name = d.name || "this deal";
+
       if (d.type === "flip") {
-        maxOffer = d.arv - d.repairs - d.holding - d.buyClose - d.sellClose - d.profit;
-        invested = maxOffer + d.repairs + d.holding + d.buyClose;
+        const arv = d.arv * cut;
+        maxOffer = arv - d.repairs - d.holding - d.buyClose - d.sellClose - d.profit;
+        invested = Math.max(0, maxOffer) + d.repairs + d.holding + d.buyClose;
         profit = d.profit;
         roi = invested > 0 ? profit / invested : 0;
+        const rule70 = arv * 0.7 - d.repairs;
+        const cushion = rule70 > 0 ? maxOffer / rule70 : 1;
+        score = clampScore((roi / 0.25) * 55 + (profit > 0 ? 25 : 0) + (cushion <= 1 ? 20 : 8));
         notes = [
-          ["ARV", money(d.arv)],
+          ["Stressed ARV", money(arv)],
           ["All-in if you pay max", money(invested + d.sellClose)],
-          ["70% rule check", money(d.arv * 0.7 - d.repairs)]
+          ["70% rule check", money(rule70)]
         ];
+        letter = `I can offer ${money(maxOffer)} for ${name}. That leaves room for ${money(d.repairs)} in repairs and ${money(d.profit)} profit after close and hold, on an ARV of ${money(arv)}.`;
       } else if (d.type === "wholesale") {
-        const buyerMax = d.arv - d.repairs - d.buyerProfit - d.closePct;
+        const arv = d.arv * cut;
+        const buyerMax = arv - d.repairs - d.buyerProfit - d.closePct;
         maxOffer = buyerMax - d.assignFee;
         profit = d.assignFee;
         invested = 0;
         roi = Infinity;
+        score = clampScore((maxOffer > 0 ? 45 : 10) + Math.min(40, d.assignFee / 200) + (buyerMax > d.assignFee ? 15 : 0));
         notes = [
+          ["Stressed ARV", money(arv)],
           ["Buyer max purchase", money(buyerMax)],
-          ["Your contract price", money(maxOffer)],
-          ["Assignment fee", money(d.assignFee)]
+          ["Your contract price", money(maxOffer)]
         ];
+        letter = `Contract price on ${name}: ${money(maxOffer)}. Assignment fee is ${money(d.assignFee)}. Buyer all-in stays under ${money(buyerMax)} before their repairs.`;
+      } else if (d.type === "rental") {
+        const rent = d.rent * cut;
+        const snap = rentalAtPrice(d.price, d, rent);
+        maxOffer = maxRentalPrice(d, rent);
+        profit = snap.cash;
+        invested = snap.down;
+        roi = snap.coc;
+        const dscrPts = snap.dscr === Infinity ? 20 : Math.min(30, (snap.dscr / 1.25) * 24);
+        score = clampScore((snap.coc / 0.12) * 50 + (snap.cash > 0 ? 20 : 0) + dscrPts);
+        notes = [
+          ["NOI / year", money(snap.noi)],
+          ["Cash flow / year", money(snap.cash)],
+          ["DSCR", Number.isFinite(snap.dscr) ? snap.dscr.toFixed(2) : "cash"],
+          ["Cap rate", pct(snap.cap)],
+          ["Mortgage / mo", money(snap.pmt)]
+        ];
+        letter = `On ${name}, rent of ${money(rent)}/mo supports a max price near ${money(maxOffer)} if I need 8% cash-on-cash and 1.25 DSCR. Asking ${money(d.price)} cash-flows about ${money(snap.cash)} a year.`;
       } else if (d.type === "pallet") {
+        const sell = d.sellEach * cut;
         const live = d.units * (1 - d.deadPct / 100);
-        const revenue = live * d.sellEach;
+        const revenue = live * sell;
         invested = d.buy + d.fees;
         profit = revenue - invested;
-        maxOffer = Math.max(0, revenue - d.fees - invested * 0.35);
+        maxOffer = Math.max(0, revenue - d.fees - (d.buy + d.fees) * 0.35);
         roi = invested > 0 ? profit / invested : 0;
+        score = clampScore((roi / 0.5) * 60 + (profit > 0 ? 25 : 0) + (d.deadPct < 20 ? 15 : 5));
         notes = [
           ["Expected revenue", money(revenue)],
           ["Live units", Math.round(live).toString()],
           ["Break-even sell-each", money(live ? invested / live : 0)]
         ];
+        letter = `I can pay up to ${money(maxOffer)} for the ${name} lot. At ${money(sell)} each and ${d.deadPct}% dead stock, expected profit is ${money(profit)}.`;
       } else {
         const mat = d.materials * (1 + d.markup / 100);
         const quote = d.hours * d.rate + mat + d.overhead;
@@ -433,111 +531,177 @@
         profit = quote - (d.materials + d.overhead);
         maxOffer = quote;
         roi = invested > 0 ? profit / invested : 0;
+        score = clampScore((roi / 1) * 50 + (profit > 0 ? 30 : 0) + (d.rate >= 75 ? 20 : 10));
         notes = [
           ["Customer quote", money(quote)],
           ["Labor line", money(d.hours * d.rate)],
           ["Materials after markup", money(mat)]
         ];
+        letter = `Quote for ${name}: ${money(quote)}. That covers ${d.hours} hours at ${money(d.rate)}/hr, materials, and trip cost.`;
       }
-      const go = profit > 0 && (d.type === "wholesale" || d.type === "service" || roi >= 0.15) && maxOffer >= 0;
-      return { ...d, maxOffer, profit, invested, roi, notes, go, id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6) };
+
+      const go = score >= 60 && maxOffer > 0 && (d.type === "wholesale" || profit > 0);
+      return {
+        ...d,
+        maxOffer, profit, invested, roi, notes, go, score, letter,
+        stress: Math.round((1 - cut) * 100),
+        id: d.id || (Date.now().toString(36) + Math.random().toString(36).slice(2, 6))
+      };
+    }
+
+    function readInputs() {
+      const data = { type: currentType, name: $("deal-name").value.trim(), stress: parseFloat($("stress").value) || 0 };
+      (SCHEMAS[currentType] || []).forEach(([key]) => { data[key] = num(key); });
+      if (editingId) data.id = editingId;
+      return data;
+    }
+
+    function renderFields(values) {
+      const schema = SCHEMAS[currentType];
+      $("fields").innerHTML = schema.map(([key, label, def]) => {
+        const val = values && values[key] != null ? values[key] : def;
+        return `<div>
+          <label for="f-${key}" class="block text-sm text-zinc-400 mb-1">${label}</label>
+          <input id="f-${key}" data-field="${key}" type="number" inputmode="decimal" step="any" value="${val}" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-400">
+        </div>`;
+      }).join("");
+      $("fields").querySelectorAll("input").forEach((el) => {
+        el.addEventListener("input", () => renderVerdict(analyze(readInputs())));
+      });
     }
 
     function renderVerdict(r) {
       lastResult = r;
       $("print-deal").classList.remove("hidden");
+      const badge = r.go
+        ? `<span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-400">GO · ${r.score}</span>`
+        : `<span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-red-500/15 text-red-400">NO-GO · ${r.score}</span>`;
       $("verdict").innerHTML = `
         <div class="flex items-start justify-between gap-3">
           <div>
-            <p class="text-zinc-400 text-sm">${r.type === "service" ? "Quote price" : "Max you should pay"}</p>
-            <p class="heading text-4xl font-bold ${r.maxOffer >= 0 ? "text-amber-400" : "text-red-400"}">${money(r.maxOffer)}</p>
+            <p class="text-zinc-400 text-sm">Max offer</p>
+            <p class="heading text-4xl font-bold text-amber-400">${money(r.maxOffer)}</p>
           </div>
-          <span class="text-xs font-semibold px-2.5 py-1 rounded-full ${r.go ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"}">${r.go ? "GO" : "NO-GO"}</span>
+          ${badge}
         </div>
-        <ul class="grid grid-cols-2 gap-2 text-sm">
+        <ul class="grid grid-cols-2 gap-3 text-sm">
           <li class="bg-zinc-950 rounded-xl p-3"><span class="block text-zinc-500">Profit</span>${money(r.profit)}</li>
-          <li class="bg-zinc-950 rounded-xl p-3"><span class="block text-zinc-500">ROI</span>${r.roi === Infinity ? "Fee deal" : pct(r.roi)}</li>
+          <li class="bg-zinc-950 rounded-xl p-3"><span class="block text-zinc-500">${r.type === "rental" ? "Cash-on-cash" : "ROI"}</span>${pct(r.roi)}</li>
+          <li class="bg-zinc-950 rounded-xl p-3"><span class="block text-zinc-500">Score</span>${r.score}/100</li>
+          <li class="bg-zinc-950 rounded-xl p-3"><span class="block text-zinc-500">Haircut</span>${r.stress}%</li>
         </ul>
         <ul class="text-sm space-y-1 text-zinc-300">
-          ${r.notes.map(([k, v]) => `<li class="flex justify-between gap-3"><span class="text-zinc-500">${k}</span><span>${v}</span></li>`).join("")}
+          ${r.notes.map(([k, v]) => `<li class="flex justify-between gap-3"><span class="text-zinc-500">${k}</span><span>${escapeHtml(v)}</span></li>`).join("")}
         </ul>
-        <p class="text-xs text-zinc-500">${escapeHtml(r.name)} · ${LABELS[r.type]}</p>`;
-    }
-
-    let liveTimer = null;
-    function debounceLiveCalc() {
-      clearTimeout(liveTimer);
-      liveTimer = setTimeout(() => {
-        const data = readInputs();
-        // Only auto-render if at least one meaningful number exists
-        const hasNums = Object.values(data).some(v => typeof v === "number" && v > 0);
-        if (hasNums) renderVerdict(analyze(data));
-      }, 280);
+        <div class="bg-zinc-950 rounded-xl p-3 text-sm">
+          <p class="text-zinc-500 text-xs uppercase tracking-wider mb-1">Offer letter</p>
+          <p id="letter-text">${escapeHtml(r.letter)}</p>
+          <button type="button" id="copy-letter" class="mt-3 text-xs border border-zinc-700 px-3 py-1.5 rounded-lg hover:border-amber-400 no-print">Copy letter</button>
+          <p id="copy-msg" class="text-xs text-emerald-400 mt-2 hidden" role="status">Copied.</p>
+        </div>`;
+      $("copy-letter").addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(r.letter);
+          $("copy-msg").classList.remove("hidden");
+        } catch {
+          $("copy-msg").textContent = "Copy blocked. Select the text.";
+          $("copy-msg").classList.remove("hidden");
+        }
+      });
     }
 
     function loadBoard() {
       try { return JSON.parse(localStorage.getItem(KEY) || "[]"); } catch { return []; }
     }
-    function saveBoard(rows) {
-      localStorage.setItem(KEY, JSON.stringify(rows));
-    }
+    function saveBoard(rows) { localStorage.setItem(KEY, JSON.stringify(rows)); }
 
     function renderStats(rows) {
       const total = rows.length;
-      const goCount = rows.filter(d => d.go).length;
-      const avgOffer = total ? Math.round(rows.reduce((s, d) => s + (d.maxOffer || 0), 0) / total) : 0;
-      const closed = rows.filter(d => d.status === "closed").length;
-      $("pipeline-stats").innerHTML = `
-        <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-center">
-          <p class="text-zinc-500 text-xs">Total deals</p>
-          <p class="heading text-xl font-semibold">${total}</p>
-        </div>
-        <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-center">
-          <p class="text-zinc-500 text-xs">GO rate</p>
-          <p class="heading text-xl font-semibold">${total ? Math.round((goCount / total) * 100) : 0}%</p>
-        </div>
-        <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-center">
-          <p class="text-zinc-500 text-xs">Avg max offer</p>
-          <p class="heading text-xl font-semibold">${money(avgOffer)}</p>
-        </div>
-        <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-center">
-          <p class="text-zinc-500 text-xs">Closed</p>
-          <p class="heading text-xl font-semibold">${closed}</p>
-        </div>`;
+      const goCount = rows.filter((d) => d.go).length;
+      const avgScore = total ? Math.round(rows.reduce((s, d) => s + (d.score || 0), 0) / total) : 0;
+      const profit = rows.reduce((s, d) => s + (d.profit || 0), 0);
+      const cells = [
+        ["Deals", total],
+        ["Go", goCount],
+        ["Avg score", avgScore],
+        ["Profit on board", money(profit)]
+      ];
+      $("pipeline-stats").innerHTML = cells.map(([k, v]) =>
+        `<div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-3"><p class="text-zinc-500">${k}</p><p class="heading text-xl font-semibold">${v}</p></div>`
+      ).join("");
     }
 
     function renderBoard() {
-      const rows = loadBoard();
-      const board = $("board");
-      $("board-empty").classList.toggle("hidden", rows.length > 0);
-      renderStats(rows);
-
-      board.innerHTML = STATUSES.map((st) => {
-        const col = rows.filter((d) => d.status === st);
-        return `
-          <section class="bg-zinc-950 border border-zinc-800 rounded-2xl p-3 min-h-[180px]">
-            <h3 class="text-xs uppercase tracking-wider text-zinc-500 mb-3">${STATUS_LABEL[st]} · ${col.length}</h3>
-            <div class="space-y-2">
-              ${col.map((d) => `
-                <article class="deal-card bg-zinc-900 border border-zinc-800 rounded-xl p-3 cursor-pointer" data-load-id="${d.id}" tabindex="0" role="button" aria-label="Load ${escapeHtml(d.name)} into analyzer">
-                  <p class="font-medium text-sm truncate">${escapeHtml(d.name)}</p>
-                  <p class="text-amber-400 text-sm">${money(d.maxOffer)}</p>
-                  <p class="text-xs text-zinc-500">${LABELS[d.type] || d.type} · ${d.go ? "GO" : "NO-GO"}</p>
-                  <label class="sr-only" for="st-${d.id}">Move ${escapeHtml(d.name)}</label>
-                  <select id="st-${d.id}" data-id="${d.id}" class="status-sel mt-2 w-full bg-zinc-950 border border-zinc-800 rounded-lg text-xs px-2 py-1" onclick="event.stopPropagation()">
-                    ${STATUSES.map((s) => `<option value="${s}" ${s === d.status ? "selected" : ""}>${STATUS_LABEL[s]}</option>`).join("")}
-                  </select>
-                  <button type="button" data-del="${d.id}" class="del-btn mt-2 text-xs text-zinc-500 hover:text-red-400" onclick="event.stopPropagation()">Remove</button>
-                </article>`).join("")}
-            </div>
-          </section>`;
+      const q = ($("board-search").value || "").toLowerCase();
+      const rows = loadBoard().filter((d) => {
+        const blob = `${d.name || ""} ${LABELS[d.type] || d.type}`.toLowerCase();
+        return !q || blob.includes(q);
+      });
+      renderStats(loadBoard());
+      $("board-empty").classList.toggle("hidden", loadBoard().length !== 0);
+      $("board").innerHTML = STATUSES.map((status) => {
+        const cards = rows.filter((d) => (d.status || "watch") === status);
+        return `<section class="bg-zinc-950/60 border border-zinc-800 rounded-2xl p-3 min-h-[140px]">
+          <h3 class="text-xs uppercase tracking-wider text-zinc-500 mb-3">${STATUS_LABEL[status]} · ${cards.length}</h3>
+          <div class="space-y-3">
+            ${cards.map((d) => `
+              <article class="deal-card bg-zinc-900 border border-zinc-800 rounded-xl p-3 cursor-pointer" data-open="${d.id}">
+                <p class="font-medium text-sm">${escapeHtml(d.name || "Untitled")}</p>
+                <p class="text-xs text-zinc-500 mt-1">${LABELS[d.type] || d.type} · score ${d.score || "—"}</p>
+                <p class="heading text-lg mt-1 ${d.go ? "text-amber-400" : "text-zinc-300"}">${money(d.maxOffer)}</p>
+                <p class="text-xs ${d.go ? "text-emerald-400" : "text-red-400"}">${d.go ? "GO" : "NO-GO"}</p>
+                <label class="sr-only" for="st-${d.id}">Move ${escapeHtml(d.name)}</label>
+                <select id="st-${d.id}" data-id="${d.id}" class="status-sel mt-2 w-full bg-zinc-950 border border-zinc-800 rounded-lg text-xs px-2 py-1" onclick="event.stopPropagation()">
+                  ${STATUSES.map((s) => `<option value="${s}" ${s === d.status ? "selected" : ""}>${STATUS_LABEL[s]}</option>`).join("")}
+                </select>
+                <button type="button" data-del="${d.id}" class="del-btn mt-2 text-xs text-zinc-500 hover:text-red-400" onclick="event.stopPropagation()">Remove</button>
+              </article>`).join("")}
+          </div>
+        </section>`;
       }).join("");
+
+      $("board").querySelectorAll("[data-open]").forEach((card) => {
+        card.addEventListener("click", () => {
+          const row = loadBoard().find((r) => r.id === card.dataset.open);
+          if (!row) return;
+          currentType = row.type || "flip";
+          document.querySelectorAll(".type-btn").forEach((b) => {
+            const on = b.dataset.type === currentType;
+            b.classList.toggle("bg-amber-400", on);
+            b.classList.toggle("text-black", on);
+            b.classList.toggle("bg-zinc-900", !on);
+            b.classList.toggle("border", !on);
+            b.classList.toggle("border-zinc-800", !on);
+            b.setAttribute("aria-selected", on ? "true" : "false");
+          });
+          editingId = row.id;
+          $("deal-name").value = row.name || "";
+          $("stress").value = row.stress || 0;
+          $("stress-label").textContent = ($("stress").value || 0) + "%";
+          renderFields(row);
+          renderVerdict(analyze(readInputs()));
+          document.getElementById("forge").scrollIntoView({ behavior: "smooth" });
+        });
+      });
+      $("board").querySelectorAll(".status-sel").forEach((sel) => {
+        sel.addEventListener("change", () => {
+          const rowsAll = loadBoard();
+          const row = rowsAll.find((r) => r.id === sel.dataset.id);
+          if (row) { row.status = sel.value; saveBoard(rowsAll); renderBoard(); }
+        });
+      });
+      $("board").querySelectorAll(".del-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          saveBoard(loadBoard().filter((r) => r.id !== btn.dataset.del));
+          renderBoard();
+        });
+      });
     }
 
-    // Type buttons
     document.querySelectorAll(".type-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         currentType = btn.dataset.type;
+        editingId = null;
         document.querySelectorAll(".type-btn").forEach((b) => {
           const on = b === btn;
           b.classList.toggle("bg-amber-400", on);
@@ -558,143 +722,100 @@
       e.preventDefault();
       renderVerdict(analyze(readInputs()));
     });
+    $("deal-name").addEventListener("input", () => {
+      if (lastResult) renderVerdict(analyze(readInputs()));
+    });
+    $("stress").addEventListener("input", () => {
+      $("stress-label").textContent = $("stress").value + "%";
+      renderVerdict(analyze(readInputs()));
+    });
 
     $("save-deal").addEventListener("click", () => {
       if (!lastResult) renderVerdict(analyze(readInputs()));
       const rows = loadBoard();
-      // If editing an existing id, replace it
-      const existingIdx = rows.findIndex(r => r.id === lastResult.id);
-      const entry = { ...lastResult, status: lastResult.go ? "offer" : "watch" };
-      if (existingIdx >= 0) {
-        rows[existingIdx] = entry;
-      } else {
-        rows.unshift(entry);
-      }
+      const entry = { ...lastResult, status: lastResult.status || (lastResult.go ? "offer" : "watch") };
+      const idx = rows.findIndex((r) => r.id === entry.id);
+      if (idx >= 0) rows[idx] = { ...rows[idx], ...entry, status: rows[idx].status || entry.status };
+      else rows.unshift(entry);
       saveBoard(rows);
       renderBoard();
       document.getElementById("pipeline").scrollIntoView({ behavior: "smooth" });
     });
 
     $("reset-deal").addEventListener("click", () => {
+      editingId = null;
       $("deal-name").value = "";
+      $("stress").value = 0;
+      $("stress-label").textContent = "0%";
       renderFields();
       lastResult = null;
       $("print-deal").classList.add("hidden");
       $("verdict").innerHTML = '<p class="text-zinc-500">Enter numbers and hit Calculate — or just type and watch it update.</p>';
     });
 
-    // Load deal from card
-    $("board").addEventListener("click", (e) => {
-      const card = e.target.closest("[data-load-id]");
-      if (!card || e.target.classList.contains("status-sel") || e.target.classList.contains("del-btn")) return;
-      const id = card.dataset.loadId;
-      const deal = loadBoard().find(d => d.id === id);
-      if (!deal) return;
+    function download(name, text, type) {
+      const blob = new Blob([text], { type });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
 
-      currentType = deal.type;
-      document.querySelectorAll(".type-btn").forEach((b) => {
-        const on = b.dataset.type === currentType;
-        b.classList.toggle("bg-amber-400", on);
-        b.classList.toggle("text-black", on);
-        b.classList.toggle("bg-zinc-900", !on);
-        b.classList.toggle("border", !on);
-        b.classList.toggle("border-zinc-800", !on);
-        b.setAttribute("aria-selected", on ? "true" : "false");
-      });
-      renderFields();
-      $("deal-name").value = deal.name || "";
-      SCHEMAS[currentType].forEach(([key]) => {
-        const el = document.getElementById("f-" + key);
-        if (el && deal[key] !== undefined) el.value = deal[key];
-      });
-      lastResult = deal;
-      renderVerdict(deal);
-      document.getElementById("forge").scrollIntoView({ behavior: "smooth" });
+    $("export-json").addEventListener("click", () => {
+      download("deal-forge-pipeline.json", JSON.stringify(loadBoard(), null, 2), "application/json");
     });
-
-    $("board").addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        const card = e.target.closest("[data-load-id]");
-        if (card) {
-          e.preventDefault();
-          card.click();
-        }
+    $("export-csv").addEventListener("click", () => {
+      const rows = loadBoard();
+      const lines = [["name", "type", "status", "maxOffer", "profit", "roi", "score", "go"]];
+      rows.forEach((r) => {
+        lines.push([
+          `"${(r.name || "").replace(/"/g, '""')}"`,
+          r.type, r.status, r.maxOffer, r.profit,
+          Number.isFinite(r.roi) ? r.roi : "",
+          r.score || "",
+          r.go
+        ].join(","));
+      });
+      download("deal-forge-pipeline.csv", lines.join("\n"), "text/csv");
+    });
+    $("import-json").addEventListener("change", async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      try {
+        const data = JSON.parse(await file.text());
+        if (!Array.isArray(data)) throw new Error("not a list");
+        const clean = data.filter((d) => d && d.type && SCHEMAS[d.type]);
+        saveBoard(clean);
+        renderBoard();
+        $("import-msg").textContent = `Imported ${clean.length} deals.`;
+        $("import-msg").classList.remove("hidden");
+      } catch {
+        $("import-msg").textContent = "Import failed. Use a Deal Forge JSON export.";
+        $("import-msg").classList.remove("hidden");
+        $("import-msg").classList.replace("text-emerald-400", "text-red-400");
       }
+      e.target.value = "";
     });
-
-    $("board").addEventListener("change", (e) => {
-      if (!e.target.classList.contains("status-sel")) return;
-      const rows = loadBoard().map((d) => d.id === e.target.dataset.id ? { ...d, status: e.target.value } : d);
-      saveBoard(rows);
-      renderBoard();
-    });
-
-    $("board").addEventListener("click", (e) => {
-      const id = e.target.dataset.del;
-      if (!id) return;
-      saveBoard(loadBoard().filter((d) => d.id !== id));
-      renderBoard();
-    });
-
     $("seed-demo").addEventListener("click", () => {
       const samples = [
-        analyze({ type: "flip", name: "124 Oak St, Taylor", arv: 220000, repairs: 28000, holding: 4500, buyClose: 3200, sellClose: 11900, profit: 30000 }),
-        analyze({ type: "pallet", name: "Amazon returns pallet", buy: 420, units: 48, sellEach: 18, fees: 85, deadPct: 12 }),
-        analyze({ type: "wholesale", name: "Lincoln Park assign", arv: 175000, repairs: 22000, buyerProfit: 20000, assignFee: 7000, closePct: 12000 }),
-        analyze({ type: "service", name: "Water heater swap", hours: 4, rate: 110, materials: 980, markup: 20, overhead: 65 })
-      ].map((d, i) => ({ ...d, status: STATUSES[i] }));
-      saveBoard(samples);
+        { type: "flip", name: "124 Oak, Taylor", arv: 220000, repairs: 28000, holding: 4500, buyClose: 3200, sellClose: 11900, profit: 30000, status: "offer" },
+        { type: "wholesale", name: "Allen Park assignment", arv: 180000, repairs: 22000, buyerProfit: 20000, assignFee: 10000, closePct: 9000, status: "watch" },
+        { type: "rental", name: "Wyandotte duplex side", price: 155000, downPct: 20, rate: 7.1, years: 30, rent: 1550, vacancyPct: 8, taxes: 2200, insurance: 1100, maintenance: 1200, mgmtPct: 0, status: "watch" },
+        { type: "pallet", name: "Amazon tools lot", buy: 380, units: 40, sellEach: 22, fees: 60, deadPct: 10, status: "contract" }
+      ].map((s) => ({ ...analyze(s), status: s.status }));
+      saveBoard(samples.concat(loadBoard()));
       renderBoard();
     });
-
     $("clear-board").addEventListener("click", () => {
       if (confirm("Clear every deal on this device?")) {
         saveBoard([]);
         renderBoard();
       }
     });
+    $("board-search").addEventListener("input", renderBoard);
+    $("print-deal").addEventListener("click", () => window.print());
 
-    // Export
-    $("export-json").addEventListener("click", () => {
-      const data = loadBoard();
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "deal-forge-pipeline.json";
-      a.click();
-      URL.revokeObjectURL(a.href);
-    });
-
-    $("export-csv").addEventListener("click", () => {
-      const rows = loadBoard();
-      if (!rows.length) return;
-      const headers = ["name", "type", "status", "maxOffer", "profit", "roi", "go"];
-      const lines = [headers.join(",")];
-      rows.forEach(r => {
-        lines.push([
-          `"${(r.name || "").replace(/"/g, '""')}"`,
-          r.type,
-          r.status,
-          r.maxOffer,
-          r.profit,
-          isFinite(r.roi) ? r.roi : "",
-          r.go
-        ].join(","));
-      });
-      const blob = new Blob([lines.join("\n")], { type: "text/csv" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "deal-forge-pipeline.csv";
-      a.click();
-      URL.revokeObjectURL(a.href);
-    });
-
-    // Print
-    $("print-deal").addEventListener("click", () => {
-      window.print();
-    });
-
-    // Keyboard
     document.addEventListener("keydown", (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
         e.preventDefault();
@@ -702,7 +823,6 @@
       }
     });
 
-    // Mobile menu
     const menuBtn = $("menu-btn");
     const mobile = $("mobile-menu");
     menuBtn.addEventListener("click", () => {
@@ -714,7 +834,6 @@
       menuBtn.setAttribute("aria-expanded", "false");
     }));
 
-    // Modal
     const modal = $("beta-modal");
     function openModal() {
       modal.classList.remove("hidden");
@@ -729,7 +848,6 @@
     $("close-beta").addEventListener("click", closeModal);
     modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
-
     $("beta-form").addEventListener("submit", (e) => {
       e.preventDefault();
       const entry = { name: $("beta-name").value.trim(), email: $("beta-email").value.trim(), at: new Date().toISOString() };
@@ -741,7 +859,6 @@
       $("beta-form").reset();
     });
 
-    // Init
     renderFields();
     renderBoard();
   </script>
