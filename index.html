@@ -104,7 +104,7 @@
             <span class="text-amber-400">Know the max offer.</span>
           </h1>
           <p class="text-lg text-zinc-400 max-w-xl mb-8">
-            Deal Forge turns a flip, wholesale contract, rental, pallet lot, or service job into profit, a 0–100 score, and a copy-ready offer. Built for operators who still live in spreadsheets.
+            Deal Forge turns a flip, wholesale contract, rental, pallet lot, or service job into profit, a 0–100 score, and a copy-ready offer. It also shows if the seller price is under your max, and gives you a link to send the deal.
           </p>
           <div class="flex flex-col sm:flex-row gap-3">
             <a href="#forge" class="inline-flex justify-center items-center gap-2 bg-amber-400 hover:bg-amber-300 text-black font-semibold px-6 py-3.5 rounded-2xl">Open the analyzer</a>
@@ -177,6 +177,16 @@
               <input id="deal-name" name="name" type="text" maxlength="80" placeholder="124 Oak St, Taylor" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-400" autocomplete="off">
             </div>
             <div id="fields" class="grid sm:grid-cols-2 gap-4"></div>
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label for="deal-next" class="block text-sm text-zinc-400 mb-1">Next move</label>
+                <input id="deal-next" type="text" maxlength="80" placeholder="Call seller Thursday" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-400">
+              </div>
+              <div>
+                <label for="deal-note" class="block text-sm text-zinc-400 mb-1">Note</label>
+                <input id="deal-note" type="text" maxlength="140" placeholder="Needs roof quote" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:border-amber-400">
+              </div>
+            </div>
             <div>
               <div class="flex items-center justify-between text-sm text-zinc-400 mb-1">
                 <label for="stress">Stress haircut</label>
@@ -190,7 +200,7 @@
               <button type="button" id="save-deal" class="flex-1 border border-zinc-700 hover:border-amber-400 py-3 rounded-xl">Save to pipeline</button>
               <button type="button" id="reset-deal" class="sm:w-auto px-5 border border-zinc-800 text-zinc-400 py-3 rounded-xl">Reset</button>
             </div>
-            <p class="text-xs text-zinc-500 no-print">Numbers update as you type. Ctrl + Enter also calculates.</p>
+            <p class="text-xs text-zinc-500 no-print">Numbers update as you type. Ctrl + Enter calculates. Share link copies this deal, not your board.</p>
           </form>
 
           <div class="lg:col-span-2 bg-zinc-900 border border-zinc-800 rounded-3xl p-5 sm:p-7 flex flex-col" aria-live="polite">
@@ -273,6 +283,7 @@
               <li>Score, stress haircut, offer letter</li>
               <li>Local pipeline board</li>
               <li>Export and import JSON, export CSV</li>
+              <li>Asking vs max, 70% check, share link</li>
               <li>Runs in any browser</li>
             </ul>
             <a href="#forge" class="block text-center bg-zinc-800 hover:bg-zinc-700 rounded-xl py-3 font-medium">Use it now</a>
@@ -316,6 +327,14 @@
             <dt class="heading text-lg font-semibold">Can I edit a saved deal?</dt>
             <dd class="text-zinc-400 mt-1">Yes. Click any deal card. It loads back into the analyzer so you can tweak and re-save.</dd>
           </div>
+          <div>
+            <dt class="heading text-lg font-semibold">What is the share link?</dt>
+            <dd class="text-zinc-400 mt-1">It packs this one deal into the URL. The other person sees the same numbers. Your pipeline stays on your device.</dd>
+          </div>
+          <div>
+            <dt class="heading text-lg font-semibold">How do I use asking vs max?</dt>
+            <dd class="text-zinc-400 mt-1">Enter the seller price. Green means you still have room. Red means their number is above the max you should pay. The 70% line is a check, not the offer.</dd>
+          </div>
         </dl>
       </div>
     </section>
@@ -356,14 +375,17 @@
     const SCHEMAS = {
       flip: [
         ["arv", "After repair value (ARV)", 220000],
+        ["asking", "Seller asking price", 165000],
         ["repairs", "Repairs", 28000],
         ["holding", "Holding costs", 4500],
+        ["holdMonths", "Hold months", 5],
         ["buyClose", "Buy closing costs", 3200],
         ["sellClose", "Sell closing costs", 11900],
         ["profit", "Target profit", 30000]
       ],
       wholesale: [
         ["arv", "ARV", 220000],
+        ["asking", "Seller asking price", 140000],
         ["repairs", "Buyer repair budget", 28000],
         ["buyerProfit", "Buyer target profit", 25000],
         ["assignFee", "Your assignment fee", 8000],
@@ -472,11 +494,19 @@
         const rule70 = arv * 0.7 - d.repairs;
         const cushion = rule70 > 0 ? maxOffer / rule70 : 1;
         score = clampScore((roi / 0.25) * 55 + (profit > 0 ? 25 : 0) + (cushion <= 1 ? 20 : 8));
+        const months = Math.max(1, d.holdMonths || 1);
+        const annual = invested > 0 ? (profit / invested) * (12 / months) : 0;
         notes = [
           ["Stressed ARV", money(arv)],
           ["All-in if you pay max", money(invested + d.sellClose)],
-          ["70% rule check", money(rule70)]
+          ["70% rule check", money(rule70)],
+          ["Annualized ROI", pct(annual)]
         ];
+        if (d.asking > 0) {
+          const room = maxOffer - d.asking;
+          notes.push(["Seller asking", money(d.asking)]);
+          notes.push([room >= 0 ? "Room under asking" : "Over your max", money(Math.abs(room))]);
+        }
         letter = `I can offer ${money(maxOffer)} for ${name}. That leaves room for ${money(d.repairs)} in repairs and ${money(d.profit)} profit after close and hold, on an ARV of ${money(arv)}.`;
       } else if (d.type === "wholesale") {
         const arv = d.arv * cut;
@@ -486,11 +516,18 @@
         invested = 0;
         roi = Infinity;
         score = clampScore((maxOffer > 0 ? 45 : 10) + Math.min(40, d.assignFee / 200) + (buyerMax > d.assignFee ? 15 : 0));
+        const rule70 = arv * 0.7 - d.repairs;
         notes = [
           ["Stressed ARV", money(arv)],
           ["Buyer max purchase", money(buyerMax)],
-          ["Your contract price", money(maxOffer)]
+          ["Your contract price", money(maxOffer)],
+          ["70% rule check", money(rule70)]
         ];
+        if (d.asking > 0) {
+          const room = maxOffer - d.asking;
+          notes.push(["Seller asking", money(d.asking)]);
+          notes.push([room >= 0 ? "Room under asking" : "Over your max", money(Math.abs(room))]);
+        }
         letter = `Contract price on ${name}: ${money(maxOffer)}. Assignment fee is ${money(d.assignFee)}. Buyer all-in stays under ${money(buyerMax)} before their repairs.`;
       } else if (d.type === "rental") {
         const rent = d.rent * cut;
@@ -541,9 +578,11 @@
       }
 
       const go = score >= 60 && maxOffer > 0 && (d.type === "wholesale" || profit > 0);
+      const asking = Number(d.asking) || 0;
+      const room = asking > 0 ? maxOffer - asking : null;
       return {
         ...d,
-        maxOffer, profit, invested, roi, notes, go, score, letter,
+        maxOffer, profit, invested, roi, notes, go, score, letter, room,
         stress: Math.round((1 - cut) * 100),
         id: d.id || (Date.now().toString(36) + Math.random().toString(36).slice(2, 6))
       };
@@ -552,8 +591,49 @@
     function readInputs() {
       const data = { type: currentType, name: $("deal-name").value.trim(), stress: parseFloat($("stress").value) || 0 };
       (SCHEMAS[currentType] || []).forEach(([key]) => { data[key] = num(key); });
+      data.note = ($("deal-note").value || "").trim();
+      data.next = ($("deal-next").value || "").trim();
       if (editingId) data.id = editingId;
       return data;
+    }
+
+    function encodeDeal(d) {
+      const payload = { type: d.type, name: d.name || "", stress: d.stress || 0, note: d.note || "", next: d.next || "" };
+      (SCHEMAS[d.type] || []).forEach(([key]) => { payload[key] = d[key] || 0; });
+      const raw = btoa(unescape(encodeURIComponent(JSON.stringify(payload)))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+      return location.origin + location.pathname + "#d=" + raw;
+    }
+
+    function decodeDeal(hash) {
+      const m = (hash || "").match(/d=([A-Za-z0-9_-]+)/);
+      if (!m) return null;
+      try {
+        let s = m[1].replace(/-/g, "+").replace(/_/g, "/");
+        while (s.length % 4) s += "=";
+        return JSON.parse(decodeURIComponent(escape(atob(s))));
+      } catch { return null; }
+    }
+
+    function applyDeal(row) {
+      if (!row || !SCHEMAS[row.type]) return;
+      currentType = row.type;
+      document.querySelectorAll(".type-btn").forEach((b) => {
+        const on = b.dataset.type === currentType;
+        b.classList.toggle("bg-amber-400", on);
+        b.classList.toggle("text-black", on);
+        b.classList.toggle("bg-zinc-900", !on);
+        b.classList.toggle("border", !on);
+        b.classList.toggle("border-zinc-800", !on);
+        b.setAttribute("aria-selected", on ? "true" : "false");
+      });
+      editingId = row.id || null;
+      $("deal-name").value = row.name || "";
+      $("deal-note").value = row.note || "";
+      $("deal-next").value = row.next || "";
+      $("stress").value = row.stress || 0;
+      $("stress-label").textContent = ($("stress").value || 0) + "%";
+      renderFields(row);
+      renderVerdict(analyze(readInputs()));
     }
 
     function renderFields(values) {
@@ -589,6 +669,7 @@
           <li class="bg-zinc-950 rounded-xl p-3"><span class="block text-zinc-500">${r.type === "rental" ? "Cash-on-cash" : "ROI"}</span>${pct(r.roi)}</li>
           <li class="bg-zinc-950 rounded-xl p-3"><span class="block text-zinc-500">Score</span>${r.score}/100</li>
           <li class="bg-zinc-950 rounded-xl p-3"><span class="block text-zinc-500">Haircut</span>${r.stress}%</li>
+          ${r.room == null ? "" : `<li class="bg-zinc-950 rounded-xl p-3 col-span-2"><span class="block text-zinc-500">${r.room >= 0 ? "Room under asking" : "Over your max"}</span><span class="${r.room >= 0 ? "text-emerald-400" : "text-red-400"}">${money(Math.abs(r.room))}</span></li>`}
         </ul>
         <ul class="text-sm space-y-1 text-zinc-300">
           ${r.notes.map(([k, v]) => `<li class="flex justify-between gap-3"><span class="text-zinc-500">${k}</span><span>${escapeHtml(v)}</span></li>`).join("")}
@@ -596,15 +677,31 @@
         <div class="bg-zinc-950 rounded-xl p-3 text-sm">
           <p class="text-zinc-500 text-xs uppercase tracking-wider mb-1">Offer letter</p>
           <p id="letter-text">${escapeHtml(r.letter)}</p>
-          <button type="button" id="copy-letter" class="mt-3 text-xs border border-zinc-700 px-3 py-1.5 rounded-lg hover:border-amber-400 no-print">Copy letter</button>
+          <div class="mt-3 flex flex-wrap gap-2 no-print">
+            <button type="button" id="copy-letter" class="text-xs border border-zinc-700 px-3 py-1.5 rounded-lg hover:border-amber-400">Copy letter</button>
+            <button type="button" id="share-deal" class="text-xs border border-zinc-700 px-3 py-1.5 rounded-lg hover:border-amber-400">Copy share link</button>
+          </div>
           <p id="copy-msg" class="text-xs text-emerald-400 mt-2 hidden" role="status">Copied.</p>
         </div>`;
       $("copy-letter").addEventListener("click", async () => {
         try {
           await navigator.clipboard.writeText(r.letter);
+          $("copy-msg").textContent = "Copied.";
           $("copy-msg").classList.remove("hidden");
         } catch {
           $("copy-msg").textContent = "Copy blocked. Select the text.";
+          $("copy-msg").classList.remove("hidden");
+        }
+      });
+      $("share-deal").addEventListener("click", async () => {
+        const link = encodeDeal(r);
+        history.replaceState(null, "", link);
+        try {
+          await navigator.clipboard.writeText(link);
+          $("copy-msg").textContent = "Share link copied.";
+          $("copy-msg").classList.remove("hidden");
+        } catch {
+          $("copy-msg").textContent = link;
           $("copy-msg").classList.remove("hidden");
         }
       });
@@ -649,7 +746,8 @@
                 <p class="font-medium text-sm">${escapeHtml(d.name || "Untitled")}</p>
                 <p class="text-xs text-zinc-500 mt-1">${LABELS[d.type] || d.type} · score ${d.score || "—"}</p>
                 <p class="heading text-lg mt-1 ${d.go ? "text-amber-400" : "text-zinc-300"}">${money(d.maxOffer)}</p>
-                <p class="text-xs ${d.go ? "text-emerald-400" : "text-red-400"}">${d.go ? "GO" : "NO-GO"}</p>
+                <p class="text-xs ${d.go ? "text-emerald-400" : "text-red-400"}">${d.go ? "GO" : "NO-GO"}${d.room == null ? "" : (d.room >= 0 ? " · room " + money(d.room) : " · over " + money(Math.abs(d.room)))}</p>
+                ${d.next ? `<p class="text-xs text-zinc-400 mt-1">${escapeHtml(d.next)}</p>` : ""}
                 <label class="sr-only" for="st-${d.id}">Move ${escapeHtml(d.name)}</label>
                 <select id="st-${d.id}" data-id="${d.id}" class="status-sel mt-2 w-full bg-zinc-950 border border-zinc-800 rounded-lg text-xs px-2 py-1" onclick="event.stopPropagation()">
                   ${STATUSES.map((s) => `<option value="${s}" ${s === d.status ? "selected" : ""}>${STATUS_LABEL[s]}</option>`).join("")}
@@ -674,12 +772,7 @@
             b.classList.toggle("border-zinc-800", !on);
             b.setAttribute("aria-selected", on ? "true" : "false");
           });
-          editingId = row.id;
-          $("deal-name").value = row.name || "";
-          $("stress").value = row.stress || 0;
-          $("stress-label").textContent = ($("stress").value || 0) + "%";
-          renderFields(row);
-          renderVerdict(analyze(readInputs()));
+          applyDeal(row);
           document.getElementById("forge").scrollIntoView({ behavior: "smooth" });
         });
       });
@@ -799,8 +892,8 @@
     });
     $("seed-demo").addEventListener("click", () => {
       const samples = [
-        { type: "flip", name: "124 Oak, Taylor", arv: 220000, repairs: 28000, holding: 4500, buyClose: 3200, sellClose: 11900, profit: 30000, status: "offer" },
-        { type: "wholesale", name: "Allen Park assignment", arv: 180000, repairs: 22000, buyerProfit: 20000, assignFee: 10000, closePct: 9000, status: "watch" },
+        { type: "flip", name: "124 Oak, Taylor", arv: 220000, asking: 155000, repairs: 28000, holding: 4500, holdMonths: 5, buyClose: 3200, sellClose: 11900, profit: 30000, next: "Send offer", status: "offer" },
+        { type: "wholesale", name: "Allen Park assignment", arv: 180000, asking: 119000, repairs: 22000, buyerProfit: 20000, assignFee: 10000, closePct: 9000, status: "watch" },
         { type: "rental", name: "Wyandotte duplex side", price: 155000, downPct: 20, rate: 7.1, years: 30, rent: 1550, vacancyPct: 8, taxes: 2200, insurance: 1100, maintenance: 1200, mgmtPct: 0, status: "watch" },
         { type: "pallet", name: "Amazon tools lot", buy: 380, units: 40, sellEach: 22, fees: 60, deadPct: 10, status: "contract" }
       ].map((s) => ({ ...analyze(s), status: s.status }));
@@ -861,6 +954,8 @@
 
     renderFields();
     renderBoard();
+    const shared = decodeDeal(location.hash);
+    if (shared) applyDeal(shared);
   </script>
 </body>
 </html>
