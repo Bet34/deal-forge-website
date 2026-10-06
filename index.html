@@ -97,14 +97,14 @@
         <div>
           <p class="inline-flex items-center gap-2 text-xs font-medium tracking-wide uppercase text-amber-400 bg-amber-400/10 border border-amber-400/20 rounded-full px-3 py-1 mb-5">
             <span class="w-1.5 h-1.5 rounded-full bg-amber-400" aria-hidden="true"></span>
-            Live in the browser. No signup.
+            Live in the browser. Repair pad + cash to close.
           </p>
           <h1 class="heading text-4xl sm:text-6xl font-bold tracking-tight leading-[1.05] mb-5">
             Run the numbers.<br>
             <span class="text-amber-400">Know the max offer.</span>
           </h1>
           <p class="text-lg text-zinc-400 max-w-xl mb-8">
-            Deal Forge turns a flip, wholesale contract, rental, pallet lot, or service job into profit, a 0–100 score, and a copy-ready offer. It shows if the seller price is under your max, builds an open / target / walk ladder, and gives you a link to send the deal.
+            Deal Forge turns a flip, wholesale contract, rental, pallet lot, or service job into profit, a 0–100 score, and a copy-ready offer. It shows if the seller price is under your max, pads repairs, shows cash to close, builds an open / target / walk ladder, and gives you a text you can send.
           </p>
           <div class="flex flex-col sm:flex-row gap-3">
             <a href="#forge" class="inline-flex justify-center items-center gap-2 bg-amber-400 hover:bg-amber-300 text-black font-semibold px-6 py-3.5 rounded-2xl">Open the analyzer</a>
@@ -244,6 +244,12 @@
         <div class="mb-4 no-print flex flex-col sm:flex-row gap-3 sm:items-center">
           <label for="board-search" class="sr-only">Search deals</label>
           <input id="board-search" type="search" placeholder="Search name or type" class="w-full sm:max-w-xs bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-amber-400">
+          <label for="board-sort" class="sr-only">Sort deals</label>
+          <select id="board-sort" class="bg-zinc-950 border border-zinc-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-amber-400">
+            <option value="new">Newest</option>
+            <option value="score">Highest score</option>
+            <option value="profit">Highest profit</option>
+          </select>
           <div id="stage-filters" class="flex flex-wrap gap-2" role="group" aria-label="Filter by stage"></div>
         </div>
         <div id="compare" class="hidden mb-6 grid sm:grid-cols-2 gap-3"></div>
@@ -261,11 +267,11 @@
         <div class="grid md:grid-cols-2 gap-4 text-sm">
           <article class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
             <h3 class="heading text-lg font-semibold mb-2">Flip</h3>
-            <p class="text-zinc-400">Max offer = ARV − repairs − holding − buy close − sell close − target profit. Go needs profit and at least 15% ROI on cash in.</p>
+            <p class="text-zinc-400">Max offer = stressed ARV − repairs with contingency − holding − buy close − sell close − target profit. Cash to close is max offer plus buy close, padded repairs, and holding. Go needs profit and at least 15% ROI on cash in.</p>
           </article>
           <article class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
             <h3 class="heading text-lg font-semibold mb-2">Wholesale</h3>
-            <p class="text-zinc-400">Buyer max = ARV − repairs − buyer profit − close/hold. Your contract price is that number minus your assignment fee.</p>
+            <p class="text-zinc-400">Buyer max = stressed ARV − repairs with contingency − buyer profit − close/hold. Your contract price is that number minus your assignment fee.</p>
           </article>
           <article class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
             <h3 class="heading text-lg font-semibold mb-2">Rental</h3>
@@ -396,7 +402,8 @@
         ["holdMonths", "Hold months", 5],
         ["buyClose", "Buy closing costs", 3200],
         ["sellClose", "Sell closing costs", 11900],
-        ["profit", "Target profit", 30000]
+        ["profit", "Target profit", 30000],
+        ["repairPad", "Repair contingency %", 10]
       ],
       wholesale: [
         ["arv", "ARV", 220000],
@@ -404,7 +411,8 @@
         ["repairs", "Buyer repair budget", 28000],
         ["buyerProfit", "Buyer target profit", 25000],
         ["assignFee", "Your assignment fee", 8000],
-        ["closePct", "Buyer close + hold estimate", 15000]
+        ["closePct", "Buyer close + hold estimate", 15000],
+        ["repairPad", "Repair contingency %", 10]
       ],
       rental: [
         ["price", "Asking price", 165000],
@@ -518,18 +526,23 @@
 
       if (d.type === "flip") {
         const arv = d.arv * cut;
-        maxOffer = arv - d.repairs - d.holding - d.buyClose - d.sellClose - d.profit;
-        invested = Math.max(0, maxOffer) + d.repairs + d.holding + d.buyClose;
+        const repairs = d.repairs * (1 + (d.repairPad || 0) / 100);
+        maxOffer = arv - repairs - d.holding - d.buyClose - d.sellClose - d.profit;
+        invested = Math.max(0, maxOffer) + repairs + d.holding + d.buyClose;
         profit = d.profit;
         roi = invested > 0 ? profit / invested : 0;
-        const rule70 = arv * 0.7 - d.repairs;
+        const rule70 = arv * 0.7 - repairs;
         const cushion = rule70 > 0 ? maxOffer / rule70 : 1;
         score = clampScore((roi / 0.25) * 55 + (profit > 0 ? 25 : 0) + (cushion <= 1 ? 20 : 8));
         const months = Math.max(1, d.holdMonths || 1);
         const annual = invested > 0 ? (profit / invested) * (12 / months) : 0;
+        const cashToClose = Math.max(0, maxOffer) + d.buyClose + repairs + d.holding;
+        const breakEven = Math.max(0, maxOffer) + repairs + d.holding + d.buyClose + d.sellClose;
         notes = [
           ["Stressed ARV", money(arv)],
-          ["All-in if you pay max", money(invested + d.sellClose)],
+          ["Repairs with pad", money(repairs)],
+          ["Cash to close", money(cashToClose)],
+          ["Break-even sell", money(breakEven)],
           ["70% rule check", money(rule70)],
           ["Annualized ROI", pct(annual)]
         ];
@@ -538,10 +551,12 @@
           notes.push(["Seller asking", money(d.asking)]);
           notes.push([room >= 0 ? "Room under asking" : "Over your max", money(Math.abs(room))]);
         }
-        letter = `I can offer ${money(maxOffer)} for ${name}. That leaves room for ${money(d.repairs)} in repairs and ${money(d.profit)} profit after close and hold, on an ARV of ${money(arv)}.`;
+        letter = `I can offer ${money(maxOffer)} for ${name}. That leaves room for ${money(repairs)} in repairs (with pad) and ${money(d.profit)} profit after close and hold, on an ARV of ${money(arv)}. Cash to close about ${money(cashToClose)}.`;
+        d._sms = `Offer on ${name}: ${money(maxOffer)}. Walk is the max. Open is ${money(Math.round(maxOffer * 0.92))}.`;
       } else if (d.type === "wholesale") {
         const arv = d.arv * cut;
-        const buyerMax = arv - d.repairs - d.buyerProfit - d.closePct;
+        const repairs = d.repairs * (1 + (d.repairPad || 0) / 100);
+        const buyerMax = arv - repairs - d.buyerProfit - d.closePct;
         maxOffer = buyerMax - d.assignFee;
         profit = d.assignFee;
         invested = 0;
@@ -550,10 +565,12 @@
         const rule70 = arv * 0.7 - d.repairs;
         notes = [
           ["Stressed ARV", money(arv)],
+          ["Repairs with pad", money(repairs)],
           ["Buyer max purchase", money(buyerMax)],
           ["Your contract price", money(maxOffer)],
           ["70% rule check", money(rule70)]
         ];
+        d._sms = `Contract on ${name}: ${money(maxOffer)}. Assignment fee ${money(d.assignFee)}. Buyer max ${money(buyerMax)}.`;
         if (d.asking > 0) {
           const room = maxOffer - d.asking;
           notes.push(["Seller asking", money(d.asking)]);
@@ -614,6 +631,7 @@
       return {
         ...d,
         maxOffer, profit, invested, roi, notes, go, score, letter, room,
+        sms: d._sms || letter,
         stress: Math.round((1 - cut) * 100),
         id: d.id || (Date.now().toString(36) + Math.random().toString(36).slice(2, 6))
       };
@@ -625,6 +643,7 @@
       data.note = ($("deal-note").value || "").trim();
       data.next = ($("deal-next").value || "").trim();
       if (editingId) data.id = editingId;
+      data.savedAt = data.savedAt || new Date().toISOString();
       return data;
     }
 
@@ -727,6 +746,7 @@
           <div class="mt-3 flex flex-wrap gap-2 no-print">
             <button type="button" id="copy-letter" class="text-xs border border-zinc-700 px-3 py-1.5 rounded-lg hover:border-amber-400">Copy letter</button>
             <button type="button" id="copy-ladder" class="text-xs border border-zinc-700 px-3 py-1.5 rounded-lg hover:border-amber-400">Copy ladder</button>
+            <button type="button" id="copy-sms" class="text-xs border border-zinc-700 px-3 py-1.5 rounded-lg hover:border-amber-400">Copy text</button>
             <button type="button" id="share-deal" class="text-xs border border-zinc-700 px-3 py-1.5 rounded-lg hover:border-amber-400">Copy share link</button>
           </div>
           <p id="copy-msg" class="text-xs text-emerald-400 mt-2 hidden" role="status">Copied.</p>
@@ -762,6 +782,11 @@
         try { await navigator.clipboard.writeText(line); $("copy-ladder").textContent = "Copied"; }
         catch { $("copy-ladder").textContent = "Copy failed"; }
       });
+      const smsBtn = $("copy-sms");
+      if (smsBtn) smsBtn.addEventListener("click", async () => {
+        try { await navigator.clipboard.writeText(r.sms || r.letter); smsBtn.textContent = "Copied"; }
+        catch { smsBtn.textContent = "Copy failed"; }
+      });
 
 
     function renderStageFilters() {
@@ -793,6 +818,14 @@
         </article>`).join("");
     }
 
+    function ageLabel(iso) {
+      const t = Date.parse(iso);
+      if (!Number.isFinite(t)) return "";
+      const days = Math.max(0, Math.floor((Date.now() - t) / 86400000));
+      if (days === 0) return "today";
+      if (days === 1) return "1 day";
+      return days + " days";
+    }
     function loadBoard() {
       try { return JSON.parse(localStorage.getItem(KEY) || "[]"); } catch { return []; }
     }
@@ -816,10 +849,15 @@
 
     function renderBoard() {
       const q = ($("board-search").value || "").toLowerCase();
+      const sort = ($("board-sort") && $("board-sort").value) || "new";
       const rows = loadBoard().filter((d) => {
         const blob = `${d.name || ""} ${LABELS[d.type] || d.type}`.toLowerCase();
         const stageOk = boardStage === "all" || (d.status || "watch") === boardStage;
         return stageOk && (!q || blob.includes(q));
+      }).sort((a, b) => {
+        if (sort === "score") return (b.score || 0) - (a.score || 0);
+        if (sort === "profit") return (b.profit || 0) - (a.profit || 0);
+        return String(b.savedAt || b.id || "").localeCompare(String(a.savedAt || a.id || ""));
       });
       renderStageFilters();
       renderCompare(loadBoard());
@@ -833,7 +871,7 @@
             ${cards.map((d) => `
               <article class="deal-card bg-zinc-900 border border-zinc-800 rounded-xl p-3 cursor-pointer" data-open="${d.id}">
                 <p class="font-medium text-sm">${escapeHtml(d.name || "Untitled")}</p>
-                <p class="text-xs text-zinc-500 mt-1">${LABELS[d.type] || d.type} · score ${d.score || "—"}</p>
+                <p class="text-xs text-zinc-500 mt-1">${LABELS[d.type] || d.type} · score ${d.score || "—"}${d.savedAt ? " · " + ageLabel(d.savedAt) : ""}</p>
                 <p class="heading text-lg mt-1 ${d.go ? "text-amber-400" : "text-zinc-300"}">${money(d.maxOffer)}</p>
                 <p class="text-xs ${d.go ? "text-emerald-400" : "text-red-400"}">${d.go ? "GO" : "NO-GO"}${d.room == null ? "" : (d.room >= 0 ? " · room " + money(d.room) : " · over " + money(Math.abs(d.room)))}</p>
                 ${d.next ? `<p class="text-xs text-zinc-400 mt-1">${escapeHtml(d.next)}</p>` : ""}
@@ -1009,6 +1047,7 @@
       }
     });
     $("board-search").addEventListener("input", renderBoard);
+    $("board-sort").addEventListener("change", renderBoard);
     $("print-deal").addEventListener("click", () => window.print());
 
     document.addEventListener("keydown", (e) => {
