@@ -7,6 +7,7 @@
   <meta name="description" content="Deal Forge is a free deal intelligence tool for flips, wholesale, rentals, pallets, and service jobs. Run the numbers, get a max offer, score, and offer letter.">
   <meta name="theme-color" content="#09090b">
   <link rel="canonical" href="https://bet34.github.io/deal-forge-website/">
+  <link rel="manifest" href="manifest.json">
   <meta property="og:title" content="Deal Forge — Analyze any deal. Know the max offer.">
   <meta property="og:description" content="Free deal analyzer and pipeline. Flip, wholesale, rental, pallet, or service job. Score, max offer, and a copy-ready offer letter.">
   <meta property="og:type" content="website">
@@ -97,14 +98,14 @@
         <div>
           <p class="inline-flex items-center gap-2 text-xs font-medium tracking-wide uppercase text-amber-400 bg-amber-400/10 border border-amber-400/20 rounded-full px-3 py-1 mb-5">
             <span class="w-1.5 h-1.5 rounded-full bg-amber-400" aria-hidden="true"></span>
-            Live in the browser. Repair pad + cash to close.
+            Live in the browser. Kill rules + MI close fill.
           </p>
           <h1 class="heading text-4xl sm:text-6xl font-bold tracking-tight leading-[1.05] mb-5">
             Run the numbers.<br>
             <span class="text-amber-400">Know the max offer.</span>
           </h1>
           <p class="text-lg text-zinc-400 max-w-xl mb-8">
-            Deal Forge turns a flip, wholesale contract, rental, pallet lot, or service job into profit, a 0–100 score, and a copy-ready offer. It shows if the seller price is under your max, pads repairs, shows cash to close, builds an open / target / walk ladder, and gives you a text you can send.
+            Deal Forge turns a flip, wholesale contract, rental, pallet lot, or service job into profit, a 0–100 score, and a copy-ready offer. It shows if the seller price is under your max, pads repairs, shows cash to close, builds an open / target / walk ladder, and kills the deal when the numbers fail a hard rule.
           </p>
           <div class="flex flex-col sm:flex-row gap-3">
             <a href="#forge" class="inline-flex justify-center items-center gap-2 bg-amber-400 hover:bg-amber-300 text-black font-semibold px-6 py-3.5 rounded-2xl">Open the analyzer</a>
@@ -175,7 +176,10 @@
           <button type="button" class="preset-btn text-sm border border-zinc-700 px-3 py-1.5 rounded-xl hover:border-amber-400" data-preset="wholesale">Wholesale assign</button>
           <button type="button" class="preset-btn text-sm border border-zinc-700 px-3 py-1.5 rounded-xl hover:border-amber-400" data-preset="pallet">Returns lot</button>
           <button type="button" class="preset-btn text-sm border border-zinc-700 px-3 py-1.5 rounded-xl hover:border-amber-400" data-preset="furnace">Furnace job</button>
+          <button type="button" class="preset-btn text-sm border border-zinc-700 px-3 py-1.5 rounded-xl hover:border-amber-400" data-preset="rental">Southgate rental</button>
+          <button type="button" id="mi-close" class="text-sm border border-amber-400/40 text-amber-300 px-3 py-1.5 rounded-xl hover:bg-amber-400/10">Fill MI close costs</button>
         </div>
+        <p id="tool-msg" class="text-xs text-zinc-500 -mt-3 mb-4" role="status"></p>
 
         <div class="grid lg:grid-cols-5 gap-6">
           <form id="deal-form" class="lg:col-span-3 bg-zinc-900 border border-zinc-800 rounded-3xl p-5 sm:p-7 space-y-4" novalidate>
@@ -454,7 +458,8 @@
       downriver: { type: "flip", name: "Taylor bungalow", arv: 185000, asking: 118000, repairs: 32000, holding: 4200, holdMonths: 4, buyClose: 2800, sellClose: 9800, profit: 22000 },
       wholesale: { type: "wholesale", name: "Lincoln Park assign", arv: 175000, asking: 98000, repairs: 26000, buyerProfit: 22000, assignFee: 7500, closePct: 12000 },
       pallet: { type: "pallet", name: "Amazon returns lot", buy: 380, units: 60, sellEach: 16, fees: 70, deadPct: 18 },
-      furnace: { type: "service", name: "Downriver furnace swap", hours: 5, rate: 125, materials: 1800, markup: 20, overhead: 65 }
+      furnace: { type: "service", name: "Downriver furnace swap", hours: 5, rate: 125, materials: 1800, markup: 20, overhead: 65 },
+      rental: { type: "rental", name: "Southgate duplex side", price: 149000, downPct: 20, rate: 7.1, years: 30, rent: 1450, vacancyPct: 8, taxes: 2800, insurance: 1300, maintenance: 1600, mgmtPct: 0 }
     };
     let boardStage = "all";
 
@@ -625,12 +630,42 @@
         letter = `Quote for ${name}: ${money(quote)}. That covers ${d.hours} hours at ${money(d.rate)}/hr, materials, and trip cost.`;
       }
 
-      const go = score >= 60 && maxOffer > 0 && (d.type === "wholesale" || profit > 0);
+      const kills = [];
+      const warns = [];
+      if (maxOffer <= 0) kills.push("Max offer is zero or negative. Walk.");
+      if (d.type === "flip") {
+        if (profit <= 0) kills.push("Target profit is not positive.");
+        if (roi < 0.12) warns.push("ROI under 12% after the repair pad. Thin.");
+        if ((d.repairPad || 0) < 10) warns.push("Repair pad is under 10%. One bad bid blows the deal.");
+        if ((d.holdMonths || 0) > 6) warns.push("Hold is over 6 months. Cash sits too long.");
+        const months = Math.max(1, d.holdMonths || 1);
+        notes.push(["Profit / day", money(profit / (months * 30))]);
+      } else if (d.type === "wholesale") {
+        if ((d.assignFee || 0) < 5000) warns.push("Assignment fee under $5,000. Spread is thin for the work.");
+        if (d.asking > 0 && maxOffer < d.asking) kills.push("Seller ask is over your contract price.");
+      } else if (d.type === "rental") {
+        const dscrNote = notes.find((n) => n[0] === "DSCR");
+        const dscrVal = dscrNote ? parseFloat(dscrNote[1]) : NaN;
+        if (profit <= 0) kills.push("Cash flow is not positive at this price.");
+        if (Number.isFinite(dscrVal) && dscrVal < 1) kills.push("DSCR under 1. Rent does not cover the debt.");
+        else if (Number.isFinite(dscrVal) && dscrVal < 1.25) warns.push("DSCR under 1.25. Lender and vacancy risk.");
+      } else if (d.type === "pallet") {
+        if (profit <= 0) kills.push("Lot loses money after dead stock and fees.");
+        if ((d.deadPct || 0) >= 25) warns.push("Dead stock is 25% or more. Verify the manifest.");
+      } else if (d.type === "service") {
+        if (profit <= 0) kills.push("Quote does not clear materials and trip cost.");
+        if ((d.rate || 0) < 75) warns.push("Hourly rate under $75. You are cheap for the drive.");
+      }
+      if (d.type !== "wholesale" && d.asking > 0 && maxOffer < d.asking) {
+        warns.push("Asking is over max. Only works if they come down.");
+      }
+      const go = kills.length === 0 && score >= 60 && maxOffer > 0 && (d.type === "wholesale" || profit > 0);
       const asking = Number(d.asking) || 0;
       const room = asking > 0 ? maxOffer - asking : null;
       return {
         ...d,
         maxOffer, profit, invested, roi, notes, go, score, letter, room,
+        kills, warns,
         sms: d._sms || letter,
         stress: Math.round((1 - cut) * 100),
         id: d.id || (Date.now().toString(36) + Math.random().toString(36).slice(2, 6))
@@ -737,9 +772,16 @@
             ${ask > 0 ? `<div class="mt-3 h-2 rounded-full bg-zinc-800 relative" aria-hidden="true"><span class="absolute inset-y-0 left-0 rounded-full bg-amber-400/80" style="width:${maxPct}%"></span><span class="absolute top-1/2 -translate-y-1/2 w-1.5 h-3 rounded bg-white" style="left:calc(${askPct}% - 3px)"></span></div><p class="text-xs text-zinc-500 mt-1">Bar is your max. Tick is seller asking.</p>` : ""}
           </div>`;
         })()}
+        ${(r.kills || []).length ? `<ul class="text-sm space-y-1">${r.kills.map((k) => `<li class="text-red-400">Kill: ${escapeHtml(k)}</li>`).join("")}</ul>` : ""}
+        ${(r.warns || []).length ? `<ul class="text-sm space-y-1">${r.warns.map((k) => `<li class="text-amber-300">Watch: ${escapeHtml(k)}</li>`).join("")}</ul>` : ""}
         <ul class="text-sm space-y-1 text-zinc-300">
           ${r.notes.map(([k, v]) => `<li class="flex justify-between gap-3"><span class="text-zinc-500">${k}</span><span>${escapeHtml(v)}</span></li>`).join("")}
         </ul>
+        ${(() => {
+          const bump = Math.min(20, (r.stress || 0) + 10);
+          const alt = analyze({ ...r, stress: bump });
+          return `<p class="text-xs text-zinc-500">At a ${bump}% haircut, max offer is ${money(alt.maxOffer)} and the call is ${alt.go ? "GO" : "NO-GO"}.</p>`;
+        })()}
         <div class="bg-zinc-950 rounded-xl p-3 text-sm">
           <p class="text-zinc-500 text-xs uppercase tracking-wider mb-1">Offer letter</p>
           <p id="letter-text">${escapeHtml(r.letter)}</p>
@@ -836,11 +878,16 @@
       const goCount = rows.filter((d) => d.go).length;
       const avgScore = total ? Math.round(rows.reduce((s, d) => s + (d.score || 0), 0) / total) : 0;
       const profit = rows.reduce((s, d) => s + (d.profit || 0), 0);
+      const closed = rows.filter((d) => d.status === "closed").reduce((s, d) => s + (d.profit || 0), 0);
+      const stale = rows.filter((d) => {
+        if (!d.savedAt || d.status === "closed") return false;
+        return (Date.now() - new Date(d.savedAt).getTime()) > 10 * 86400000;
+      }).length;
       const cells = [
         ["Deals", total],
         ["Go", goCount],
-        ["Avg score", avgScore],
-        ["Profit on board", money(profit)]
+        ["Closed profit", money(closed)],
+        ["Stale 10d+", stale]
       ];
       $("pipeline-stats").innerHTML = cells.map(([k, v]) =>
         `<div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-3"><p class="text-zinc-500">${k}</p><p class="heading text-xl font-semibold">${v}</p></div>`
@@ -871,7 +918,7 @@
             ${cards.map((d) => `
               <article class="deal-card bg-zinc-900 border border-zinc-800 rounded-xl p-3 cursor-pointer" data-open="${d.id}">
                 <p class="font-medium text-sm">${escapeHtml(d.name || "Untitled")}</p>
-                <p class="text-xs text-zinc-500 mt-1">${LABELS[d.type] || d.type} · score ${d.score || "—"}${d.savedAt ? " · " + ageLabel(d.savedAt) : ""}</p>
+                <p class="text-xs text-zinc-500 mt-1">${LABELS[d.type] || d.type} · score ${d.score || "—"}${d.savedAt ? " · " + ageLabel(d.savedAt) : ""}${d.savedAt && d.status !== "closed" && (Date.now() - new Date(d.savedAt).getTime()) > 10 * 86400000 ? " · stale" : ""}</p>
                 <p class="heading text-lg mt-1 ${d.go ? "text-amber-400" : "text-zinc-300"}">${money(d.maxOffer)}</p>
                 <p class="text-xs ${d.go ? "text-emerald-400" : "text-red-400"}">${d.go ? "GO" : "NO-GO"}${d.room == null ? "" : (d.room >= 0 ? " · room " + money(d.room) : " · over " + money(Math.abs(d.room)))}</p>
                 ${d.next ? `<p class="text-xs text-zinc-400 mt-1">${escapeHtml(d.next)}</p>` : ""}
@@ -1096,6 +1143,22 @@
     renderFields();
     renderBoard();
 
+    document.getElementById("mi-close").addEventListener("click", () => {
+      const msg = document.getElementById("tool-msg");
+      if (currentType !== "flip") {
+        msg.textContent = "MI close fill works on house flips. Seller transfer tax is about $4.30 per $500 in most Michigan counties. Agent commission is not included.";
+        return;
+      }
+      const asking = num("asking") || num("arv");
+      const arv = num("arv") || asking;
+      const transfer = Math.ceil(arv / 500) * 4.3;
+      const buyEl = document.querySelector('[data-field="buyClose"]');
+      const sellEl = document.querySelector('[data-field="sellClose"]');
+      if (buyEl) buyEl.value = Math.round(1800 + asking * 0.004);
+      if (sellEl) sellEl.value = Math.round(transfer + 1200);
+      msg.textContent = "Filled buy close (title estimate) and sell close (MI transfer tax + $1,200 title). Agent fee is not in that number.";
+      renderVerdict(analyze(readInputs()));
+    });
     document.querySelectorAll(".preset-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         const row = PRESETS[btn.dataset.preset];
