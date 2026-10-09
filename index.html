@@ -178,6 +178,15 @@
           <button type="button" class="preset-btn text-sm border border-zinc-700 px-3 py-1.5 rounded-xl hover:border-amber-400" data-preset="furnace">Furnace job</button>
           <button type="button" class="preset-btn text-sm border border-zinc-700 px-3 py-1.5 rounded-xl hover:border-amber-400" data-preset="rental">Southgate rental</button>
           <button type="button" id="mi-close" class="text-sm border border-amber-400/40 text-amber-300 px-3 py-1.5 rounded-xl hover:bg-amber-400/10">Fill MI close costs</button>
+          <label class="sr-only" for="county">Michigan county</label>
+          <select id="county" class="text-sm bg-zinc-950 border border-zinc-700 px-3 py-1.5 rounded-xl text-zinc-200">
+            <option value="4.30">Wayne · $4.30 / $500</option>
+            <option value="4.30">Oakland · $4.30 / $500</option>
+            <option value="4.30">Macomb · $4.30 / $500</option>
+            <option value="4.30">Monroe · $4.30 / $500</option>
+            <option value="3.75">State tax only · $3.75 / $500</option>
+          </select>
+          <button type="button" class="preset-btn text-sm border border-zinc-700 px-3 py-1.5 rounded-xl hover:border-amber-400" data-preset="wyandotte">Wyandotte flip</button>
         </div>
         <p id="tool-msg" class="text-xs text-zinc-500 -mt-3 mb-4" role="status"></p>
 
@@ -257,7 +266,7 @@
           <div id="stage-filters" class="flex flex-wrap gap-2" role="group" aria-label="Filter by stage"></div>
         </div>
         <div id="compare" class="hidden mb-6 grid sm:grid-cols-2 gap-3"></div>
-        <div id="pipeline-stats" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 text-sm"></div>
+        <div id="pipeline-stats" class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6 text-sm"></div>
         <div id="board" class="grid md:grid-cols-4 gap-4"></div>
         <p id="board-empty" class="text-zinc-500 text-sm mt-4 hidden">No deals yet. Analyze one and save it, or load samples.</p>
         <p id="import-msg" class="text-sm text-emerald-400 mt-3 hidden" role="status"></p>
@@ -303,7 +312,7 @@
               <li>Local pipeline board</li>
               <li>Export and import JSON, export CSV</li>
               <li>Asking vs max, 70% check, share link</li>
-              <li>Offer ladder: open, target, walk</li>
+              <li>Offer ladder: open 92%, target 96%, walk 100%</li>
               <li>Downriver presets and stage filter</li>
               <li>Runs in any browser</li>
             </ul>
@@ -407,7 +416,10 @@
         ["buyClose", "Buy closing costs", 3200],
         ["sellClose", "Sell closing costs", 11900],
         ["profit", "Target profit", 30000],
-        ["repairPad", "Repair contingency %", 10]
+        ["repairPad", "Repair contingency %", 10],
+        ["partnerPct", "Your profit share %", 100],
+        ["hmPoints", "Hard money points %", 0],
+        ["hmRate", "Hard money rate %", 0]
       ],
       wholesale: [
         ["arv", "ARV", 220000],
@@ -459,13 +471,14 @@
       wholesale: { type: "wholesale", name: "Lincoln Park assign", arv: 175000, asking: 98000, repairs: 26000, buyerProfit: 22000, assignFee: 7500, closePct: 12000 },
       pallet: { type: "pallet", name: "Amazon returns lot", buy: 380, units: 60, sellEach: 16, fees: 70, deadPct: 18 },
       furnace: { type: "service", name: "Downriver furnace swap", hours: 5, rate: 125, materials: 1800, markup: 20, overhead: 65 },
-      rental: { type: "rental", name: "Southgate duplex side", price: 149000, downPct: 20, rate: 7.1, years: 30, rent: 1450, vacancyPct: 8, taxes: 2800, insurance: 1300, maintenance: 1600, mgmtPct: 0 }
+      rental: { type: "rental", name: "Southgate duplex side", price: 149000, downPct: 20, rate: 7.1, years: 30, rent: 1450, vacancyPct: 8, taxes: 2800, insurance: 1300, maintenance: 1600, mgmtPct: 0 },
+      wyandotte: { type: "flip", name: "Wyandotte brick", arv: 210000, asking: 129000, repairs: 38000, holding: 4800, holdMonths: 5, buyClose: 2600, sellClose: 11200, profit: 28000, repairPad: 12, partnerPct: 100, hmPoints: 2, hmRate: 12 }
     };
     let boardStage = "all";
 
     function ladder(maxOffer) {
       const walk = Math.round(maxOffer);
-      const target = Math.round(maxOffer);
+      const target = Math.round(maxOffer * 0.96);
       const open = Math.round(maxOffer * 0.92);
       return { open, target, walk };
     }
@@ -532,16 +545,24 @@
       if (d.type === "flip") {
         const arv = d.arv * cut;
         const repairs = d.repairs * (1 + (d.repairPad || 0) / 100);
-        maxOffer = arv - repairs - d.holding - d.buyClose - d.sellClose - d.profit;
-        invested = Math.max(0, maxOffer) + repairs + d.holding + d.buyClose;
-        profit = d.profit;
+        const baseOffer = arv - repairs - d.holding - d.buyClose - d.sellClose - d.profit;
+        const months = Math.max(1, d.holdMonths || 1);
+        const share = Math.max(0, Math.min(100, d.partnerPct == null ? 100 : d.partnerPct)) / 100;
+        let hmCost = 0;
+        maxOffer = baseOffer;
+        for (let i = 0; i < 3; i++) {
+          const loan = Math.max(0, maxOffer);
+          hmCost = loan * ((d.hmPoints || 0) / 100) + loan * ((d.hmRate || 0) / 100) * (months / 12);
+          maxOffer = baseOffer - hmCost;
+        }
+        invested = Math.max(0, maxOffer) + repairs + d.holding + d.buyClose + hmCost;
+        profit = d.profit * share;
         roi = invested > 0 ? profit / invested : 0;
         const rule70 = arv * 0.7 - repairs;
         const cushion = rule70 > 0 ? maxOffer / rule70 : 1;
         score = clampScore((roi / 0.25) * 55 + (profit > 0 ? 25 : 0) + (cushion <= 1 ? 20 : 8));
-        const months = Math.max(1, d.holdMonths || 1);
         const annual = invested > 0 ? (profit / invested) * (12 / months) : 0;
-        const cashToClose = Math.max(0, maxOffer) + d.buyClose + repairs + d.holding;
+        const cashToClose = Math.max(0, maxOffer) + d.buyClose + repairs + d.holding + hmCost;
         const breakEven = Math.max(0, maxOffer) + repairs + d.holding + d.buyClose + d.sellClose;
         notes = [
           ["Stressed ARV", money(arv)],
@@ -549,15 +570,18 @@
           ["Cash to close", money(cashToClose)],
           ["Break-even sell", money(breakEven)],
           ["70% rule check", money(rule70)],
-          ["Annualized ROI", pct(annual)]
+          ["Annualized ROI", pct(annual)],
+          ["Hard money cost", money(hmCost)],
+          ["Your take", money(d.profit * share)],
+          ["Partner take", money(d.profit * (1 - share))]
         ];
         if (d.asking > 0) {
           const room = maxOffer - d.asking;
           notes.push(["Seller asking", money(d.asking)]);
           notes.push([room >= 0 ? "Room under asking" : "Over your max", money(Math.abs(room))]);
         }
-        letter = `I can offer ${money(maxOffer)} for ${name}. That leaves room for ${money(repairs)} in repairs (with pad) and ${money(d.profit)} profit after close and hold, on an ARV of ${money(arv)}. Cash to close about ${money(cashToClose)}.`;
-        d._sms = `Offer on ${name}: ${money(maxOffer)}. Walk is the max. Open is ${money(Math.round(maxOffer * 0.92))}.`;
+        letter = `I can offer ${money(maxOffer)} for ${name}. That leaves room for ${money(repairs)} in repairs (with pad) and ${money(d.profit)} profit after close, hold, and hard money, on an ARV of ${money(arv)}. My cut is ${money(d.profit * share)}. Cash to close about ${money(cashToClose)}.`;
+        d._sms = `Offer on ${name}: open ${money(Math.round(maxOffer * 0.92))}, target ${money(Math.round(maxOffer * 0.96))}, walk ${money(maxOffer)}.`;
       } else if (d.type === "wholesale") {
         const arv = d.arv * cut;
         const repairs = d.repairs * (1 + (d.repairPad || 0) / 100);
@@ -638,6 +662,8 @@
         if (roi < 0.12) warns.push("ROI under 12% after the repair pad. Thin.");
         if ((d.repairPad || 0) < 10) warns.push("Repair pad is under 10%. One bad bid blows the deal.");
         if ((d.holdMonths || 0) > 6) warns.push("Hold is over 6 months. Cash sits too long.");
+        if ((d.hmRate || 0) > 0 && hmCost > d.profit * 0.25) warns.push("Hard money eats more than 25% of target profit.");
+        if (share < 1 && share > 0 && profit < 10000) warns.push("Your cut is under $10,000 after the split.");
         const months = Math.max(1, d.holdMonths || 1);
         notes.push(["Profit / day", money(profit / (months * 30))]);
       } else if (d.type === "wholesale") {
@@ -887,6 +913,7 @@
         ["Deals", total],
         ["Go", goCount],
         ["Closed profit", money(closed)],
+        ["Open cash", money(rows.filter((d) => d.status !== "closed").reduce((s2, d) => s2 + Math.max(0, d.invested || 0), 0))],
         ["Stale 10d+", stale]
       ];
       $("pipeline-stats").innerHTML = cells.map(([k, v]) =>
@@ -1151,12 +1178,14 @@
       }
       const asking = num("asking") || num("arv");
       const arv = num("arv") || asking;
-      const transfer = Math.ceil(arv / 500) * 4.3;
+      const rate = parseFloat($("county").value) || 4.3;
+      const countyName = $("county").selectedOptions[0].textContent.split("·")[0].trim();
+      const transfer = Math.ceil(arv / 500) * rate;
       const buyEl = document.querySelector('[data-field="buyClose"]');
       const sellEl = document.querySelector('[data-field="sellClose"]');
       if (buyEl) buyEl.value = Math.round(1800 + asking * 0.004);
       if (sellEl) sellEl.value = Math.round(transfer + 1200);
-      msg.textContent = "Filled buy close (title estimate) and sell close (MI transfer tax + $1,200 title). Agent fee is not in that number.";
+      msg.textContent = "Filled buy close (title estimate) and sell close (" + countyName + " transfer tax + $1,200 title). Agent fee is not in that number. Confirm the county before you wire.";
       renderVerdict(analyze(readInputs()));
     });
     document.querySelectorAll(".preset-btn").forEach((btn) => {
