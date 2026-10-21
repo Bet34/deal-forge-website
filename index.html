@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Deal Forge — Downriver Deal Analyzer. Max offer, deal score, kill rules for flips, wholesale, rentals, returns, and service jobs. Data stays local.">
 <title>Deal Forge — Downriver Deal Analyzer</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -11,38 +12,47 @@
 body { font-family: 'Inter', system-ui, sans-serif; }
 .heading { font-family: 'Space Grotesk', sans-serif; }
 input[type="number"]::-webkit-inner-spin-button { opacity: 1; }
-.gauge { transition: width 0.4s ease; }
-.card-hover { transition: transform 0.15s ease, border-color 0.15s ease; }
-.card-hover:hover { transform: translateY(-2px); border-color: #10b981; }
+.gauge { transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+.card-hover { transition: all 0.2s ease; }
+.card-hover:hover { transform: translateY(-2px); border-color: #10b981; box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.3); }
+.toast { animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards; }
+@keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes fadeOut { to { opacity: 0; transform: translateY(-10px); } }
+.focus-ring:focus { outline: 2px solid #10b981; outline-offset: 2px; }
 </style>
 <script>
 tailwind.config = {
   theme: {
     extend: {
       colors: {
-        forge: { 50: '#ecfdf5', 400: '#34d399', 500: '#10b981', 600: '#059669' }
+        forge: { 50: '#ecfdf5', 400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857' }
       }
     }
   }
 }
 </script>
 </head>
-<body class="bg-zinc-950 text-zinc-100 min-h-screen">
-<nav class="border-b border-zinc-800 bg-zinc-950/95 backdrop-blur sticky top-0 z-40">
+<body class="bg-zinc-950 text-zinc-100 min-h-screen antialiased">
+<!-- Toast container -->
+<div id="toast" class="fixed bottom-6 right-6 z-50 hidden"></div>
+
+<nav class="border-b border-zinc-800 bg-zinc-950/95 backdrop-blur-md sticky top-0 z-40">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
     <div class="flex items-center gap-3">
-      <div class="w-10 h-10 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-xl flex items-center justify-center text-xl font-bold text-black">F</div>
+      <div class="w-10 h-10 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-xl flex items-center justify-center text-xl font-bold text-black shadow-lg">F</div>
       <span class="heading text-2xl font-bold tracking-tight">Deal Forge</span>
     </div>
-    <div class="flex items-center gap-2 text-sm">
-      <button onclick="showTab('analyzer')" class="px-3 py-2 rounded-xl hover:bg-zinc-800 transition">Analyzer</button>
-      <button onclick="showTab('pipeline')" class="px-3 py-2 rounded-xl hover:bg-zinc-800 transition">Pipeline</button>
-      <button onclick="exportAll()" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-black font-medium transition">Export</button>
+    <div class="flex items-center gap-1 sm:gap-2 text-sm">
+      <button onclick="showTab('analyzer')" id="nav-analyzer" class="px-3 py-2 rounded-xl hover:bg-zinc-800 transition focus-ring"><i class="fa-solid fa-calculator mr-1"></i><span class="hidden sm:inline">Analyzer</span></button>
+      <button onclick="showTab('pipeline')" id="nav-pipeline" class="px-3 py-2 rounded-xl hover:bg-zinc-800 transition focus-ring"><i class="fa-solid fa-list mr-1"></i><span class="hidden sm:inline">Pipeline</span></button>
+      <button onclick="showTab('dashboard')" id="nav-dashboard" class="px-3 py-2 rounded-xl hover:bg-zinc-800 transition focus-ring"><i class="fa-solid fa-chart-line mr-1"></i><span class="hidden sm:inline">Dashboard</span></button>
+      <button onclick="exportAll()" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-black font-medium transition focus-ring" title="Export pipeline"><i class="fa-solid fa-download"></i></button>
     </div>
   </div>
 </nav>
 
 <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+  <!-- Analyzer -->
   <div id="tab-analyzer">
     <div class="mb-8 text-center sm:text-left">
       <div class="inline-flex items-center gap-2 bg-zinc-900 px-4 py-1 rounded-full text-xs mb-4 border border-zinc-800">Downriver • Local data • Kill bad deals</div>
@@ -51,15 +61,16 @@ tailwind.config = {
     </div>
 
     <div class="grid lg:grid-cols-3 gap-6">
+      <!-- Inputs -->
       <div class="lg:col-span-1 space-y-6">
         <div class="bg-zinc-900 rounded-2xl p-6 border border-zinc-800 card-hover">
           <div class="mb-4">
             <label class="block text-sm font-medium mb-2" for="dealName">Deal name / address</label>
-            <input type="text" id="dealName" placeholder="Taylor flip — 123 Main" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500">
+            <input type="text" id="dealName" placeholder="Taylor flip — 123 Main" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 focus-ring">
           </div>
 
           <label class="block text-sm font-medium mb-2" for="dealType">Deal type</label>
-          <select id="dealType" onchange="updateFields()" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500">
+          <select id="dealType" onchange="updateFields()" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 focus-ring">
             <option value="flip">Fix & Flip</option>
             <option value="wholesale">Wholesale</option>
             <option value="rental">Rental / BRRRR</option>
@@ -69,7 +80,7 @@ tailwind.config = {
 
           <div class="mt-4">
             <label class="block text-sm font-medium mb-2" for="preset">Preset</label>
-            <select id="preset" onchange="loadPreset()" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500">
+            <select id="preset" onchange="loadPreset()" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 focus-ring">
               <option value="">Custom</option>
               <option value="taylor">Taylor Flip</option>
               <option value="wyandotte">Wyandotte Flip</option>
@@ -83,44 +94,44 @@ tailwind.config = {
           <div class="mt-4 grid grid-cols-2 gap-3">
             <div>
               <label class="block text-xs text-zinc-400 mb-1" for="arv">ARV / Sell Price</label>
-              <input type="number" id="arv" value="185000" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" oninput="calc()">
+              <input type="number" id="arv" value="185000" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 focus-ring" oninput="calc()">
             </div>
             <div>
               <label class="block text-xs text-zinc-400 mb-1" for="asking">Asking / List</label>
-              <input type="number" id="asking" value="145000" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" oninput="calc()">
+              <input type="number" id="asking" value="145000" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 focus-ring" oninput="calc()">
             </div>
           </div>
 
           <div class="mt-3 grid grid-cols-2 gap-3">
             <div>
               <label class="block text-xs text-zinc-400 mb-1" for="repairs">Repairs</label>
-              <input type="number" id="repairs" value="28000" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" oninput="calc()">
+              <input type="number" id="repairs" value="28000" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 focus-ring" oninput="calc()">
             </div>
             <div>
               <label class="block text-xs text-zinc-400 mb-1" for="contingency">Contingency %</label>
-              <input type="number" id="contingency" value="15" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" oninput="calc()">
+              <input type="number" id="contingency" value="15" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 focus-ring" oninput="calc()">
             </div>
           </div>
 
           <div id="hardMoneyFields" class="mt-3 grid grid-cols-2 gap-3">
             <div>
               <label class="block text-xs text-zinc-400 mb-1" for="hmRate">Hard money rate %</label>
-              <input type="number" id="hmRate" value="12" step="0.1" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" oninput="calc()">
+              <input type="number" id="hmRate" value="12" step="0.1" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 focus-ring" oninput="calc()">
             </div>
             <div>
               <label class="block text-xs text-zinc-400 mb-1" for="hmPoints">Points</label>
-              <input type="number" id="hmPoints" value="2" step="0.5" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" oninput="calc()">
+              <input type="number" id="hmPoints" value="2" step="0.5" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 focus-ring" oninput="calc()">
             </div>
           </div>
 
           <div class="mt-3">
             <label class="block text-xs text-zinc-400 mb-1" for="partnerSplit">Your partner split %</label>
-            <input type="number" id="partnerSplit" value="70" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" oninput="calc()">
+            <input type="number" id="partnerSplit" value="70" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 focus-ring" oninput="calc()">
           </div>
 
           <div class="mt-3">
             <label class="block text-xs text-zinc-400 mb-1" for="county">County (MI close)</label>
-            <select id="county" onchange="calc()" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
+            <select id="county" onchange="calc()" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 focus-ring">
               <option value="wayne">Wayne ($0.55)</option>
               <option value="oakland">Oakland</option>
               <option value="macomb">Macomb</option>
@@ -132,23 +143,24 @@ tailwind.config = {
           <div class="mt-3 grid grid-cols-2 gap-3">
             <div>
               <label class="block text-xs text-zinc-400 mb-1" for="holdMonths">Hold months</label>
-              <input type="number" id="holdMonths" value="4" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" oninput="calc()">
+              <input type="number" id="holdMonths" value="4" step="0.1" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 focus-ring" oninput="calc()">
             </div>
             <div>
               <label class="block text-xs text-zinc-400 mb-1" for="haircut">Stress haircut %</label>
-              <input type="number" id="haircut" value="0" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" oninput="calc()">
+              <input type="number" id="haircut" value="0" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 focus-ring" oninput="calc()">
             </div>
           </div>
 
           <div class="mt-3">
             <label class="block text-xs text-zinc-400 mb-1" for="notes">Notes</label>
-            <textarea id="notes" rows="2" placeholder="Seller motivation, issues, next step..." class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500"></textarea>
+            <textarea id="notes" rows="2" placeholder="Seller motivation, issues, next step..." class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 focus-ring"></textarea>
           </div>
 
-          <button onclick="saveDeal()" class="mt-6 w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-black font-semibold rounded-xl transition">Save to Pipeline</button>
+          <button onclick="saveDeal()" class="mt-6 w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-black font-semibold rounded-xl transition focus-ring">Save to Pipeline</button>
         </div>
       </div>
 
+      <!-- Results -->
       <div class="lg:col-span-2 space-y-6">
         <div class="grid sm:grid-cols-3 gap-4">
           <div class="bg-zinc-900 rounded-2xl p-5 border border-zinc-800">
@@ -175,7 +187,7 @@ tailwind.config = {
         </div>
 
         <div id="killBox" class="bg-red-950/40 border border-red-800 rounded-2xl p-4 hidden">
-          <div class="font-semibold text-red-400">Hard Kill</div>
+          <div class="font-semibold text-red-400 flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i> Hard Kill</div>
           <div id="killText" class="text-sm text-red-300 mt-1"></div>
         </div>
 
@@ -196,7 +208,7 @@ tailwind.config = {
         <div class="bg-zinc-900 rounded-2xl p-6 border border-zinc-800">
           <div class="flex justify-between items-center mb-3">
             <h3 class="font-semibold">Offer ladder</h3>
-            <button onclick="copyLadder()" class="text-xs text-emerald-400 hover:underline">Copy</button>
+            <button onclick="copyLadder()" class="text-xs text-emerald-400 hover:underline focus-ring">Copy</button>
           </div>
           <div id="ladder" class="space-y-2 text-sm"></div>
         </div>
@@ -204,37 +216,49 @@ tailwind.config = {
         <div class="bg-zinc-900 rounded-2xl p-6 border border-zinc-800">
           <div class="flex justify-between items-center mb-3">
             <h3 class="font-semibold">Copy-ready text</h3>
-            <button onclick="copyText()" class="text-xs text-emerald-400 hover:underline">Copy</button>
+            <button onclick="copyText()" class="text-xs text-emerald-400 hover:underline focus-ring">Copy</button>
           </div>
-          <pre id="offerText" class="text-xs bg-zinc-950 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap"></pre>
+          <pre id="offerText" class="text-xs bg-zinc-950 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap font-mono"></pre>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Pipeline -->
   <div id="tab-pipeline" class="hidden">
     <div class="flex flex-wrap justify-between items-center mb-6 gap-3">
       <h2 class="heading text-3xl font-bold">Pipeline</h2>
       <div class="flex gap-2 flex-wrap items-center">
-        <input id="searchDeals" type="text" placeholder="Search deals..." oninput="renderPipeline()" class="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
-        <select id="stageFilter" onchange="renderPipeline()" class="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm">
+        <input id="searchDeals" type="text" placeholder="Search deals..." oninput="renderPipeline()" class="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 focus-ring">
+        <select id="stageFilter" onchange="renderPipeline()" class="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm focus-ring">
           <option value="all">All stages</option>
           <option value="lead">Lead</option>
           <option value="offer">Offer</option>
           <option value="under">Under contract</option>
           <option value="closed">Closed</option>
         </select>
-        <button onclick="importJSON()" class="px-3 py-2 bg-zinc-800 rounded-xl text-sm hover:bg-zinc-700">Import JSON</button>
+        <button onclick="importJSON()" class="px-3 py-2 bg-zinc-800 rounded-xl text-sm hover:bg-zinc-700 focus-ring">Import JSON</button>
+        <button onclick="clearAll()" class="px-3 py-2 bg-red-900/50 hover:bg-red-800 rounded-xl text-sm text-red-300 focus-ring">Clear All</button>
       </div>
     </div>
     <div id="pipelineBoard" class="space-y-3"></div>
     <div class="mt-6 text-sm text-zinc-500" id="pipelineStats"></div>
   </div>
+
+  <!-- Dashboard -->
+  <div id="tab-dashboard" class="hidden">
+    <h2 class="heading text-3xl font-bold mb-6">Dashboard</h2>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8" id="dashStats"></div>
+    <div class="bg-zinc-900 rounded-2xl p-6 border border-zinc-800">
+      <h3 class="font-semibold mb-4">Pipeline Snapshot</h3>
+      <div id="dashList" class="space-y-2 text-sm"></div>
+    </div>
+  </div>
 </main>
 
 <footer class="border-t border-zinc-800 py-8 text-center text-xs text-zinc-500">
   Not financial advice. Confirm county transfer tax before you wire. Agent commission not included. Michigan state $3.75 / $500 + typical county $0.55.<br>
-  Data stays in your browser. Live at <a href="https://bet34.github.io/deal-forge-website/" class="text-emerald-400">bet34.github.io/deal-forge-website</a>
+  Data stays in your browser. Live at <a href="https://bet34.github.io/deal-forge-website/" class="text-emerald-400 hover:underline">bet34.github.io/deal-forge-website</a>
 </footer>
 
 <script>
@@ -247,10 +271,21 @@ const PRESETS = {
   southgate: { dealType:'rental', arv:145000, asking:118000, repairs:18000, contingency:10, hmRate:7.5, hmPoints:1, partnerSplit:100, county:'wayne', holdMonths:12, haircut:0 }
 };
 
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.className = `fixed bottom-6 right-6 z-50 toast px-4 py-3 rounded-xl text-sm font-medium shadow-lg ${type === 'success' ? 'bg-emerald-600 text-black' : 'bg-red-600 text-white'}`;
+  t.textContent = msg;
+  t.classList.remove('hidden');
+  setTimeout(() => t.classList.add('hidden'), 3000);
+}
+
 function showTab(tab) {
-  document.getElementById('tab-analyzer').classList.toggle('hidden', tab !== 'analyzer');
-  document.getElementById('tab-pipeline').classList.toggle('hidden', tab !== 'pipeline');
+  ['analyzer','pipeline','dashboard'].forEach(t => {
+    document.getElementById('tab-' + t).classList.toggle('hidden', t !== tab);
+    document.getElementById('nav-' + t).classList.toggle('bg-zinc-800', t === tab);
+  });
   if (tab === 'pipeline') renderPipeline();
+  if (tab === 'dashboard') renderDashboard();
 }
 
 function updateFields() {
@@ -270,6 +305,7 @@ function loadPreset() {
     if (el) el.value = p[k];
   });
   updateFields();
+  showToast('Preset loaded');
 }
 
 function getNum(id) { return parseFloat(document.getElementById(id).value) || 0; }
@@ -332,23 +368,24 @@ function calc() {
   score = Math.max(0, Math.min(100, Math.round(score)));
 
   let kill = '';
-  if (maxOffer < asking * 0.85) kill = 'Asking is more than 15% over max. Walk.';
-  if (profit < 5000 && type !== 'service') kill = 'Profit too thin after contingency.';
-  if (type === 'flip' && hold > 8) kill = 'Hold too long for flip.';
+  if (maxOffer < asking * 0.8) kill = 'Max offer too far below asking. Walk.';
+  else if (profit < 5000 && type !== 'service') kill = 'Thin profit. Needs better numbers or walk.';
+  else if (type === 'flip' && hold > 8) kill = 'Hold too long for hard money. Risk high.';
+
+  const room = maxOffer - asking;
+  const roomPct = Math.min(100, Math.max(0, (room / (asking || 1)) * 100 + 50));
 
   document.getElementById('maxOffer').textContent = '$' + maxOffer.toLocaleString();
   document.getElementById('dealScore').textContent = score;
-  document.getElementById('scoreLabel').textContent = score >= 70 ? 'Strong' : score >= 50 ? 'Watch' : 'Weak';
-  document.getElementById('scoreLabel').className = 'text-xs mt-1 ' + (score >= 70 ? 'text-emerald-400' : score >= 50 ? 'text-amber-400' : 'text-red-400');
-  document.getElementById('scoreBar').style.width = score + '%';
-  document.getElementById('scoreBar').className = 'h-full gauge ' + (score >= 70 ? 'bg-emerald-500' : score >= 50 ? 'bg-amber-500' : 'bg-red-500');
+  document.getElementById('dealScore').className = `heading text-3xl font-bold mt-1 ${score >= 70 ? 'text-emerald-400' : score >= 50 ? 'text-yellow-400' : 'text-red-400'}`;
+  document.getElementById('scoreLabel').textContent = score >= 80 ? 'Strong' : score >= 60 ? 'Playable' : score >= 40 ? 'Marginal' : 'Weak';
   document.getElementById('yourTake').textContent = '$' + yourTake.toLocaleString();
-  document.getElementById('partnerTake').textContent = 'Partner: $' + partnerTake.toLocaleString();
+  document.getElementById('partnerTake').textContent = partnerTake > 0 ? `Partner: $${partnerTake.toLocaleString()}` : '';
 
-  const room = maxOffer - asking;
-  const roomPct = Math.max(0, Math.min(100, (room / Math.max(asking,1)) * 100 + 50));
-  document.getElementById('roomBar').style.width = roomPct + '%';
+  document.getElementById('roomBar').style.width = Math.min(100, Math.max(10, roomPct)) + '%';
   document.getElementById('roomText').textContent = room >= 0 ? `$${room.toLocaleString()} room` : `$${Math.abs(room).toLocaleString()} over`;
+
+  document.getElementById('scoreBar').style.width = score + '%';
 
   document.getElementById('killBox').classList.toggle('hidden', !kill);
   document.getElementById('killText').textContent = kill;
@@ -357,7 +394,7 @@ function calc() {
   document.getElementById('cashClose').textContent = '$' + Math.round(cashToClose).toLocaleString();
   document.getElementById('beSell').textContent = '$' + Math.round(maxOffer + totalRepairs + miCosts).toLocaleString();
   document.getElementById('profitDay').textContent = hold > 0 ? '$' + Math.round(profit / (hold * 30)).toLocaleString() : '—';
-  document.getElementById('annROI').textContent = hold > 0 ? Math.round((profit / maxOffer) * (12 / hold) * 100) + '%' : '—';
+  document.getElementById('annROI').textContent = hold > 0 && maxOffer > 0 ? Math.round((profit / maxOffer) * (12 / hold) * 100) + '%' : '—';
   document.getElementById('miCosts').textContent = '$' + Math.round(miCosts).toLocaleString();
   document.getElementById('coc').textContent = coc ? coc.toFixed(1) + '%' : '—';
   document.getElementById('dscr').textContent = dscr ? dscr.toFixed(2) : '—';
@@ -366,34 +403,33 @@ function calc() {
   const target = Math.round(maxOffer * 0.96);
   const walk = maxOffer;
   document.getElementById('ladder').innerHTML = `
-    <div class="flex justify-between"><span>Open (92%)</span><span class="font-mono">$${open.toLocaleString()}</span></div>
-    <div class="flex justify-between"><span>Target (96%)</span><span class="font-mono">$${target.toLocaleString()}</span></div>
-    <div class="flex justify-between"><span>Walk</span><span class="font-mono">$${walk.toLocaleString()}</span></div>
+    <div class="flex justify-between"><span>Open (92%)</span><span class="font-mono text-emerald-300">$${open.toLocaleString()}</span></div>
+    <div class="flex justify-between"><span>Target (96%)</span><span class="font-mono text-emerald-300">$${target.toLocaleString()}</span></div>
+    <div class="flex justify-between"><span>Walk</span><span class="font-mono text-emerald-300">$${walk.toLocaleString()}</span></div>
   `;
 
   const name = document.getElementById('dealName').value || 'Deal';
   document.getElementById('offerText').textContent = `${name}
 Max offer: $${maxOffer.toLocaleString()}
-Score: ${score}
+Score: ${score} (${document.getElementById('scoreLabel').textContent})
 Your take: $${yourTake.toLocaleString()}
 ${kill ? 'KILL: ' + kill : 'Passes basic screen'}`;
 
   window.currentCalc = {
     name, type, maxOffer, score, yourTake, partnerTake, stage: 'lead',
-    notes: document.getElementById('notes').value
+    notes: document.getElementById('notes').value,
+    asking, arv: getNum('arv'), repairs, holdMonths: hold
   };
 }
 
 function copyLadder() {
   const t = document.getElementById('ladder').innerText;
-  navigator.clipboard.writeText(t);
-  alert('Ladder copied.');
+  navigator.clipboard.writeText(t).then(() => showToast('Ladder copied'));
 }
 
 function copyText() {
   const t = document.getElementById('offerText').textContent;
-  navigator.clipboard.writeText(t);
-  alert('Text copied.');
+  navigator.clipboard.writeText(t).then(() => showToast('Text copied'));
 }
 
 function saveDeal() {
@@ -401,7 +437,7 @@ function saveDeal() {
   const d = { ...window.currentCalc, id: Date.now(), savedAt: new Date().toISOString() };
   deals.push(d);
   localStorage.setItem('forgeDeals', JSON.stringify(deals));
-  alert('Saved to pipeline.');
+  showToast('Saved to pipeline');
   showTab('pipeline');
 }
 
@@ -415,6 +451,7 @@ function renderPipeline() {
 
   if (!filtered.length) {
     board.innerHTML = '<div class="text-zinc-500 text-center py-12">No deals yet. Save one from the analyzer.</div>';
+    document.getElementById('pipelineStats').textContent = '';
     return;
   }
   board.innerHTML = filtered.map(d => `
@@ -426,13 +463,13 @@ function renderPipeline() {
       </div>
       <div class="flex items-center gap-3 text-sm">
         <div class="text-emerald-400 font-medium">$${d.yourTake?.toLocaleString()}</div>
-        <select onchange="updateStage(${d.id}, this.value)" class="bg-zinc-800 text-xs rounded px-2 py-1">
+        <select onchange="updateStage(${d.id}, this.value)" class="bg-zinc-800 text-xs rounded px-2 py-1 focus-ring">
           <option value="lead" ${d.stage==='lead'?'selected':''}>lead</option>
           <option value="offer" ${d.stage==='offer'?'selected':''}>offer</option>
           <option value="under" ${d.stage==='under'?'selected':''}>under</option>
           <option value="closed" ${d.stage==='closed'?'selected':''}>closed</option>
         </select>
-        <button onclick="deleteDeal(${d.id})" class="text-red-400 text-xs hover:underline">Delete</button>
+        <button onclick="deleteDeal(${d.id})" class="text-red-400 text-xs hover:underline focus-ring">Delete</button>
       </div>
     </div>
   `).join('');
@@ -449,6 +486,7 @@ function updateStage(id, stage) {
   if (d) d.stage = stage;
   localStorage.setItem('forgeDeals', JSON.stringify(deals));
   renderPipeline();
+  showToast('Stage updated');
 }
 
 function deleteDeal(id) {
@@ -457,6 +495,14 @@ function deleteDeal(id) {
   deals = deals.filter(d => d.id !== id);
   localStorage.setItem('forgeDeals', JSON.stringify(deals));
   renderPipeline();
+  showToast('Deal deleted', 'error');
+}
+
+function clearAll() {
+  if (!confirm('Clear entire pipeline? This cannot be undone.')) return;
+  localStorage.removeItem('forgeDeals');
+  renderPipeline();
+  showToast('Pipeline cleared', 'error');
 }
 
 function exportAll() {
@@ -466,6 +512,7 @@ function exportAll() {
   a.href = URL.createObjectURL(blob);
   a.download = 'deal-forge-pipeline.json';
   a.click();
+  showToast('Exported JSON');
 }
 
 function importJSON() {
@@ -474,22 +521,45 @@ function importJSON() {
   input.accept = '.json';
   input.onchange = e => {
     const file = e.target.files[0];
+    if (!file) return;
     const reader = new FileReader();
     reader.onload = ev => {
       try {
         const data = JSON.parse(ev.target.result);
+        if (!Array.isArray(data)) throw new Error();
         localStorage.setItem('forgeDeals', JSON.stringify(data));
         renderPipeline();
-        alert('Imported.');
-      } catch { alert('Bad JSON.'); }
+        showToast('Imported ' + data.length + ' deals');
+      } catch { showToast('Bad JSON', 'error'); }
     };
     reader.readAsText(file);
   };
   input.click();
 }
 
+function renderDashboard() {
+  const deals = JSON.parse(localStorage.getItem('forgeDeals') || '[]');
+  const total = deals.length;
+  const closed = deals.filter(d => d.stage === 'closed').length;
+  const openCash = deals.filter(d => d.stage !== 'closed').reduce((s,d) => s + (d.yourTake||0), 0);
+  const avgScore = total ? Math.round(deals.reduce((s,d) => s + (d.score||0), 0) / total) : 0;
+
+  document.getElementById('dashStats').innerHTML = `
+    <div class="bg-zinc-900 rounded-2xl p-5 border border-zinc-800"><div class="text-xs text-zinc-400">Total Deals</div><div class="heading text-3xl font-bold text-emerald-400">${total}</div></div>
+    <div class="bg-zinc-900 rounded-2xl p-5 border border-zinc-800"><div class="text-xs text-zinc-400">Closed</div><div class="heading text-3xl font-bold">${closed}</div></div>
+    <div class="bg-zinc-900 rounded-2xl p-5 border border-zinc-800"><div class="text-xs text-zinc-400">Open Cash</div><div class="heading text-3xl font-bold text-cyan-400">$${openCash.toLocaleString()}</div></div>
+    <div class="bg-zinc-900 rounded-2xl p-5 border border-zinc-800"><div class="text-xs text-zinc-400">Avg Score</div><div class="heading text-3xl font-bold">${avgScore}</div></div>
+  `;
+
+  const recent = deals.slice(-5).reverse();
+  document.getElementById('dashList').innerHTML = recent.length 
+    ? recent.map(d => `<div class="flex justify-between py-1 border-b border-zinc-800"><span>${d.name || 'Unnamed'}</span><span class="text-emerald-400">$${d.yourTake?.toLocaleString() || 0}</span></div>`).join('')
+    : '<div class="text-zinc-500">No deals yet.</div>';
+}
+
 updateFields();
 calc();
+showTab('analyzer');
 </script>
 </body>
 </html>
